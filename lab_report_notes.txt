@@ -1,0 +1,53 @@
+USER REQ
+
+*User creates a user with a username and password
+*User enters username and passowrd to gain access to his messages
+*User with access can send messages to other users and read his own
+
+
+SYSTEM REQ
+
+*System stores usernames and encrypted passwords in database
+*System gives access to usernames with correct passwords
+
+()()add about how messages are stored, keys are stored, both are retrieved ()()
+
+*On message sending, system encrypts message then uploads to database  ()() with key? ()()
+ - pycrypto
+ - AES CBC
+
+
+
+
+
+
+
+//Use pycrypto
+
+user | 2\3;423]\[4;2\3]1;
+ - gain access with proper password
+
+ - access lets you decrypt your messages
+
+
+
+
+
+
+use random for key generation???
+or use passwords combined
+
+
+base64 encode the encrypted data before inserting into file
+ - lose some efficiency in storage, but program doesn't crash
+
+
+
+
+
+
+
+
+
+
+
