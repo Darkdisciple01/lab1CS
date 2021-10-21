@@ -150,7 +150,7 @@ Widgets(0,Widget("","Continue",x=235,y=270,wide=100,com=[1,88]))
 Widgets(0,Widget("","create new user",x=240,y=315,wide=50,fs=6,com=[2,3]))
 
 # error
-Widgets(15,Widget("usernamenot in database, try again","",x=220,y=250,fs=10,wide=200))
+Widgets(15,Widget("username not in database, try again","",x=220,y=250,fs=10,wide=200))
 Widgets(16,Widget("incorrect password, try again","",x=220,y=250,fs=10,wide=200))
 
 
@@ -169,6 +169,10 @@ Widgets(1,Widget("","Logout",530,10,wide=40,fs=8,com=[0,3]))
 
 
 # send new message
+
+
+# display messages - text box and support changing the message in it
+
 
 # error for if no messages
 
