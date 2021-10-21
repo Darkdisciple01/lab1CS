@@ -2,7 +2,7 @@ exec(open("./lab_GUI.py").read())
 from file_operations import *
 from encryption_functions import *
 
-decrypt_file()
+#decrypt_file()
 
 user_database, pass_database, key_database, init_vec_database = load_file_data()
 account = []
@@ -118,4 +118,4 @@ if x == 2:
     print()
 
 
-encrypt_file()
+#encrypt_file()
