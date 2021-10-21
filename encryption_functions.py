@@ -1,7 +1,7 @@
 from Crypto.Util.Padding import pad, unpad
 from Crypto import Random
 from Crypto.Cipher import AES
-
+from hashlib import sha256
 
 """
 Encrypts data with AES cipher
@@ -73,6 +73,20 @@ def decrypt_file(filename='data.json'):
     # write the original file
     with open(filename, "wb") as file:
         file.write(decrypted_data)
+
+"""
+Creates sha256 hash of string
+password must be encoded
+"""
+
+def sha256_hash(password):
+    h = sha256(password)
+    hb = h.digest()
+    return hb
+
+
+
+
 
 
 

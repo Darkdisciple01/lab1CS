@@ -1,28 +1,38 @@
 {
     "users": [
         {
-            "username": "admin2",
-            "password": "ISni4VWzTaBJKNtYAumOPw==",
-            "key": "mppqGTPewz5s61FMuVkY1wxe8yk4hmMShzeF7ssucTA=",
-            "init_vec": "RnNB3X1o8RDr4408JMeKIw=="
+            "username": "jon",
+            "password": "u0cu24aAmnYZNtkMcK60NGYYqnHaegDBbjNIY0mRCP0="
+        },
+        {
+            "username": "jon0",
+            "password": "CL9m4HLO0Ao18iKGFsKTq/rh7Q7Ii0uwHTmsFapqlPI="
+        },
+        {
+            "username": "jon1",
+            "password": "0wWMBTmVXYo9YS3ETEwX47CFWqYzuK0CsIDBADmtqpE="
         },
         {
             "username": "admin",
-            "password": "cAiJto56uME5v1GA1kC4/A==",
-            "key": "eKMqa7osmWmXwCBEMZ+spsNfoalFlabruTOr1l3HEzg=",
-            "init_vec": "rH1OxTGTMl0PYTeJq2dEkg=="
-        },
+            "password": "jGl25bVBBBW96Qi9Te4V37Fnqchz/Eu4qB9vKrRIqRg="
+        }
+    ],
+    "messages": [
         {
-            "username": "jon",
-            "password": "Kb84oS/okjS+IsruLYz2nQ==",
-            "key": "wRXaRZHRD9Pz8va8l/tZm0RmEZwglyHrXvmngwuUwNE=",
-            "init_vec": "zw3JPTmV+LuMWhE6h0gJgw=="
-        },
-        {
-            "username": "jswizz",
-            "password": "FcFRHETQXv2FV2zRXbGCWA==",
-            "key": "XldrFt3ggRaEAmfffFkQFc/hjbfBtThIJC0Kk3BtVJA=",
-            "init_vec": "IP0xA5e0Kzakk0nhyWJZFw=="
+            "user1": "admin",
+            "user2": "admin2",
+            "key": "joeh3y2oih4uo2===",
+            "init_vec": "iy23o8y4ow3iuho==",
+            "msg_data": [
+                {
+                    "sent_by": "admin",
+                    "msg": "oiwuerioho8734yoig3287=="
+                },
+                {
+                    "sent_by": "admin2",
+                    "msg": "p9823y8og2o8t4=="
+                }
+            ]
         }
     ]
 }

@@ -4,7 +4,7 @@ from encryption_functions import *
 
 #decrypt_file()
 
-user_database, pass_database, key_database, init_vec_database = load_file_data()
+user_database, pass_database = load_file_data()
 account = []
 
 
@@ -15,7 +15,7 @@ Main loop for GUI
 
 
 def mainfunc(seq):
-    global userBox, passBox, user_database, pass_database, key_database, init_vec_database, account
+    global userBox, passBox, user_database, pass_database, account
     if seq == [1,88]:
 
         """On pressing |continue| to login"""
@@ -28,10 +28,10 @@ def mainfunc(seq):
         else:
             # Gets index of username, checks passwords
             index = user_database.index(username)
-            enc_password, n = aes_encrypt(password, key_database[index], init_vec_database[index])
-            if not enc_password == pass_database[index]:
+            hashed_password = sha256_hash(password.encode())
+            if not hashed_password == pass_database[index]:
                 Widgets.seq([0,3,16])
-            account = [user_database[index], pass_database[index], key_database[index], init_vec_database[index]]
+            account = [user_database[index], pass_database[index]]
             print(account)
 
     if seq == [0,3,88]:
@@ -46,10 +46,11 @@ def mainfunc(seq):
 
         if(password == confirm and not empty):
             key = Random.get_random_bytes(32)
-            enc_password, init_vec = aes_encrypt(password, key)
+            password = password.encode()
+            hashed_password = sha256_hash(password)
 
-            add_user(username, enc_password, key, init_vec)
-            user_database, pass_database, key_database, init_vec_database = load_file_data()
+            add_user(username, hashed_password)
+            user_database, pass_database = load_file_data()
 
             print("account created: " + str(username))
         elif empty:
