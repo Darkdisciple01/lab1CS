@@ -9,7 +9,5 @@
 
 [ ] write project report
 
-[ ] user id instead of username?
-
-[ ] include hash function
+[X] include hash function
 
