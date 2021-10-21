@@ -25,6 +25,8 @@ SYSTEM REQ
 //Use pycrypto
 
 user | 2\3;423]\[4;2\3]1;
+ - encrypt password, compare encrypted
+
  - gain access with proper password
 
  - access lets you decrypt your messages
