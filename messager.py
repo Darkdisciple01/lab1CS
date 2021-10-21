@@ -33,6 +33,7 @@ def mainfunc(seq):
                 Widgets.seq([0,3,16])
             account = [user_database[index], pass_database[index], key_database[index], init_vec_database[index]]
             print(account)
+
     if seq == [0,3,88]:
 
         """On pressing |continue| to create new user"""
