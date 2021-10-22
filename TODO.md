@@ -11,3 +11,5 @@
 
 [X] include hash function
 
+[ ] change error of conflicting usernames -> create user to Widget error
+

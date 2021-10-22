@@ -31,8 +31,9 @@ def mainfunc(seq):
             hashed_password = sha256_hash(password.encode())
             if not hashed_password == pass_database[index]:
                 Widgets.seq([0,3,16])
-            account = [user_database[index], pass_database[index]]
-            print(account)
+            else:
+                account = [user_database[index], pass_database[index]]
+                print(account)
 
     if seq == [0,3,88]:
 
@@ -71,6 +72,7 @@ Different operation modes
 
 
 
+
 import sys
 import time
 x = (int)(sys.argv[1]) if (len(sys.argv)>1) else 0
@@ -82,19 +84,11 @@ if x == 0:
     root.mainloop()
 
 if x == 1:
-    root.withdraw()
+    #root.withdraw()
     print("Beginning Testing")
-
-    username = "admin"
-    password = "admin"
-
-    #key = Random.get_random_bytes(32)
-    #enc_password, init_vec = aes_encrypt(password, key)
-
-    #add_user(username, enc_password, key, init_vec)
-
-    remove_user("jswizz")
-
+    Widgets.seq([1,100])
+    root.mainloop()
+    
 
 if x == 2:
     root.withdraw()
