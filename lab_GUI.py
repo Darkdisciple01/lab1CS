@@ -37,56 +37,53 @@ The Widget class is designed to more easily customize and initialize widgets fro
 
 class Widget:
     global root,backgroundColor,defaultFontColor
-    def __init__(self,message="",button="",x=0,y=0,color="lightgray",wide=200,high=40,fs=14,
-            com=0,hidden=0,entry_var="",msgload=0):
-        
+    def __init__(self, widget, frame, x, y):
         self.data = [0,0]
-        
-        if(message!=""):
-            frame = tk.Frame(root,bg=backgroundColor,width=wide,height=high,highlightbackground=color)
-            msg = tk.Message(frame, text=message, width=wide,bg=backgroundColor,fg=defaultFontColor)
-            msg.configure(font=("Times "+str(fs)))
-            self.data=[msg,frame,x,y,0]
+        self.data=[widget,frame,x,y,0]
 
-        elif(button!=""):
-            frame = tk.Frame(root,bg=backgroundColor,width=wide,height=high,highlightbackground=color)
-
-            if msgload == 0:
-                btn = tk.Button(frame, text=button,bg="gray",fg=defaultFontColor,command= lambda: Widgets.seq(com))
-            else:
-                btn = tk.Button(frame, text=button,bg="gray",fg=defaultFontColor,command= lambda: chat_load(com, msgload-1))
-
-            btn.configure(font=("Roboto "+str(fs)))
-            self.data=[btn,frame,x,y,1]
-        
-        else:
-            #input box
-            frame = tk.Frame(root,bg=backgroundColor,width=wide,height=high,highlightbackground=color)
-            entry_var=tk.StringVar()
-            entry = tk.Entry(frame, textvariable=entry_var)
-            entry.configure(font=("Times "+str(fs)))
-            if(hidden):
-                entry.configure(show="*")
-            self.data=[entry,frame,x,y,1,entry_var]
-    
     def place(self):
         #print("trying to place message" if self.data[4]==0 else "trying to print button") 
-        if self.data[1] != -1:
-            self.data[1].place(x=self.data[2],y=self.data[3])
-            self.data[0].pack()
-        else:
-            self.data[0].place(x=self.data[2],y=self.data[3])
-        
+        self.data[1].place(x=self.data[2],y=self.data[3])
+        self.data[0].pack()
 
     def forget(self):
-        if self.data[1] != -1:
-            self.data[0].pack_forget()
-            self.data[1].place_forget()
+        self.data[0].pack_forget()
+        self.data[1].place_forget()
+
+
+class Message(Widget):
+    def __init__(self, text, x, y, wide=200, high=40, fs=14, color="lightgray"):
+        frame = tk.Frame(root,bg=backgroundColor,width=wide,height=high,highlightbackground=color)
+        msg = tk.Message(frame, text=text, width=wide,bg=backgroundColor,fg=defaultFontColor)
+        msg.configure(font=("Times "+str(fs)))
+        super().__init__(msg, frame, x, y)
+
+
+class Button(Widget):
+    def __init__(self, text, x, y, msgload=0, com=0, wide=200, high=40, fs=14, color="lightgray"):
+        frame = tk.Frame(root,bg=backgroundColor,width=wide,height=high,highlightbackground=color)
+        if msgload == 0:
+            btn = tk.Button(frame, text=text,bg="gray",fg=defaultFontColor,command= lambda: Widgets.seq(com))
         else:
-            self.data[0].place_forget()
+            btn = tk.Button(frame, text=text,bg="gray",fg=defaultFontColor,command= lambda: chat_load(com, msgload-1))
+        btn.configure(font=("Roboto "+str(fs)))
+        super().__init__(btn, frame, x, y)
+
+
+class Input_Box(Widget):
+    def __init__(self, x, y, hidden=0, entry_var="", wide=200, high=40, fs=14, color="lightgray"):
+        frame = tk.Frame(root,bg=backgroundColor,width=wide,height=high,highlightbackground=color)
+        entry_var=tk.StringVar()
+        entry = tk.Entry(frame, textvariable=entry_var)
+        entry.configure(font=("Times "+str(fs)))
+        if(hidden):
+            entry.configure(show="*")
+        super().__init__(entry, frame, x, y)
+        self.data.append(entry_var)
 
     def get_val(self):
         return self.data[5].get()
+
 
 
 """
@@ -144,17 +141,17 @@ login page
 """
 
 # title
-Widgets(0,Widget("Message Center","",halfx-95,10,"darkgray",wide=200,high=40,fs=20))
+Widgets(0,Message("Message Center",halfx-95,10,color="darkgray",wide=200,high=40,fs=20))
 
 # continue
-Widgets(0,Widget("","Continue",x=235,y=270,wide=100,com=[1,88]))
+Widgets(0,Button("Continue",x=235,y=270,wide=100,com=[1,88]))
 
 # create new user
-Widgets(0,Widget("","create new user",x=240,y=315,wide=50,fs=6,com=[2,3]))
+Widgets(0,Button("create new user",x=240,y=315,wide=50,fs=6,com=[2,3]))
 
 # error
-Widgets(15,Widget("username not in database, try again","",x=220,y=250,fs=10,wide=200))
-Widgets(16,Widget("incorrect password, try again","",x=220,y=250,fs=10,wide=200))
+Widgets(15,Message("username not in database, try again",x=220,y=250,fs=10,wide=200))
+Widgets(16,Message("incorrect password, try again",x=220,y=250,fs=10,wide=200))
 
 
 
@@ -165,10 +162,10 @@ message board
 """
 
 # title
-Widgets(1,Widget("Messages","",halfx-50,10,"darkgray",wide=200,high=40,fs=20))
+Widgets(1,Message("Messages",halfx-50,10,color="darkgray",wide=200,high=40,fs=20))
 
 # log out
-Widgets(1,Widget("","Logout",530,10,wide=40,fs=8,com=[0,3]))
+Widgets(1,Button("Logout",530,10,wide=40,fs=8,com=[0,3]))
 
 
 # create new chat
@@ -188,19 +185,19 @@ create user
 """
 
 # title
-Widgets(2,Widget("Create New User","",halfx-70,10,wide=200,fs=18))
+Widgets(2,Message("Create New User",halfx-70,10,wide=200,fs=18))
 
 # continue
-Widgets(2,Widget("","Continue",x=235,y=320,wide=100,com=[0,3,88]))
+Widgets(2,Button("Continue",x=235,y=320,wide=100,com=[0,3,88]))
 
 # confirm password
-confirm_passBox = Widget("","",250,275,wide=100,hidden=1)
+confirm_passBox = Input_Box(250,275,wide=100,hidden=1)
 Widgets(2,confirm_passBox)
-Widgets(2,Widget("Confirm password:","",x=100,y=265,wide=100,fs=15))
+Widgets(2,Message("Confirm password:",x=100,y=265,wide=100,fs=15))
 
 # error
-Widgets(17,Widget("passwords do not match","",230,300,fs=10,wide=200))
-Widgets(18,Widget("please enter username and password","",230,300,fs=10,wide=200))
+Widgets(17,Message("passwords do not match",230,300,fs=10,wide=200))
+Widgets(18,Message("please enter username and password",230,300,fs=10,wide=200))
 
 # error for username already taken
 
@@ -211,12 +208,12 @@ user input
 """
 
 # user input
-Widgets(3,Widget("Username:","",x=100,y=125,wide=100,fs=15))
-Widgets(3,Widget("Password:","",x=100,y=200,wide=100,fs=15))
+Widgets(3,Message("Username:",x=100,y=125,wide=100,fs=15))
+Widgets(3,Message("Password:",x=100,y=200,wide=100,fs=15))
 
-userBox = Widget("","",x=250,y=125,wide=100)
+userBox = Input_Box(x=250,y=125,wide=100)
 Widgets(3,userBox)
-passBox = Widget("","",x=250,y=200,wide=100,hidden=1)
+passBox = Input_Box(x=250,y=200,wide=100,hidden=1)
 Widgets(3,passBox)
 
 
@@ -225,13 +222,13 @@ Pages 100-110
 chat display
 """
 
-Widgets(100,Widget("","v",x=550,y=350,wide=70,com=[1,101]))
+Widgets(100,Button("v",x=550,y=350,wide=70,com=[1,101]))
 
 for i in range(101,108):
-    Widgets(i,Widget("","^",x=550,y=40,wide=70,com=[1,i-1]))
-    Widgets(i,Widget("","v",x=550,y=350,wide=70,com=[1,i+1]))
+    Widgets(i,Button("^",x=550,y=40,wide=70,com=[1,i-1]))
+    Widgets(i,Button("v",x=550,y=350,wide=70,com=[1,i+1]))
 
-Widgets(108,Widget("","^",x=550,y=40,wide=70,com=[1,107]))
+Widgets(108,Button("^",x=550,y=40,wide=70,com=[1,107]))
 
 
 
