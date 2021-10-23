@@ -23,6 +23,7 @@ root.geometry(str(dim[0])+"x"+str(dim[1]))
 root.configure(background=backgroundColor)
 root.wm_title("")
 
+account = []
 
 """
 _________________________________________________________________
@@ -69,6 +70,9 @@ class Button(Widget):
         btn.configure(font=("Roboto "+str(fs)))
         super().__init__(btn, frame, x, y)
 
+    def configure(self, wide, high):
+        self.data[0].configure(width=wide, height=high)
+
 
 class Input_Box(Widget):
     def __init__(self, x, y, hidden=0, entry_var="", wide=200, high=40, fs=14, color="lightgray"):
@@ -84,6 +88,17 @@ class Input_Box(Widget):
     def get_val(self):
         return self.data[5].get()
 
+    def clear(self):
+        return
+
+
+class Text(Widget):
+    def __init__(self, text, x, y, wide=200, high=40, fs=14, color="lightgray", highl=2):
+        frame = tk.Frame(root,bg=backgroundColor,width=wide,height=high,highlightbackground=color)
+        txt = tk.Text(frame,width=wide, height=highl, bg=backgroundColor,fg=defaultFontColor,highlightthickness=0,borderwidth=0)
+        txt.insert(tk.END, text)
+        txt.configure(font=("Helvetica "+str(fs)))
+        super().__init__(txt, frame, x, y)
 
 
 """
@@ -200,7 +215,7 @@ Widgets(17,Message("passwords do not match",230,300,fs=10,wide=200))
 Widgets(18,Message("please enter username and password",230,300,fs=10,wide=200))
 
 # error for username already taken
-
+Widgets(19,Message("username already taken",230,300,fs=10,wide=200))
 
 """
 Page 3
@@ -222,17 +237,105 @@ Pages 100-110
 chat display
 """
 
-Widgets(100,Button("v",x=550,y=350,wide=70,com=[1,101]))
 
-for i in range(101,108):
-    Widgets(i,Button("^",x=550,y=40,wide=70,com=[1,i-1]))
-    Widgets(i,Button("v",x=550,y=350,wide=70,com=[1,i+1]))
+def chat_load(data, mode, account=[]):
 
-Widgets(108,Button("^",x=550,y=40,wide=70,com=[1,107]))
+    # mode 2 is loading all the chats on Widgets seq 100-108, data = json["messages"]
+    if mode == 2:
+        user = account[0] 
+        Widgets.rem_seq(100)
+
+        Widgets(100,Button("^",x=550,y=40,wide=70,com=[1,100]))
+        Widgets(100,Button("v",x=550,y=350,wide=70,com=[1,101]))
+
+        for i in range(101,108):
+            Widgets.rem_seq(i)
+            Widgets(i,Button("^",x=550,y=40,wide=70,com=[1,i-1]))
+            Widgets(i,Button("v",x=550,y=350,wide=70,com=[1,i+1]))
+
+        Widgets.rem_seq(108)
+    
+        Widgets(108,Button("^",x=550,y=40,wide=70,com=[1,107]))
+        Widgets(108,Button("v",x=550,y=350,wide=70,com=[1,108]))
+
+        i = 0
+        for chat in data:
+            if user == chat["user1"] or user == chat["user2"]:
+                name = chat["user1"] if not chat["user1"] == user else chat["user2"]
+                new_button = Button(name,x=40,y=50+75*(int(i)%5),wide=200,msgload=2,com=[chat,account,name])
+                new_button.configure(wide=35,high=1)
+                Widgets(100+(int(i)/5),new_button)
+                i+=1
+                if i >= 45:
+                    print("Please expand chat database")
+                    exit(-3)
+        if i == 0:
+            Widgets(100,Widget("Sorry, you have no chats at this time","",halfx-150,10,wide=200,fs=18))
+
+        Widgets.seq([100,1])
+
+    # mode 1 is getting password, data = ["messages",account,name], seq 109
+    elif mode == 1:
+        # get the password
+        passkeyBox = Input_Box(x=205,y=200,wide=100,hidden=1)
+        Widgets(109,Message("Please enter the password for this chat",halfx-125,50,wide=250,fs=18))
+        Widgets(109,passkeyBox)
+        Widgets(109,Button("Continue",x=235,y=320,wide=100,msgload=1,com=[data, passkeyBox]))
+        Widgets(109,Button("Back",530,10,wide=40,fs=8,com=[100,1]))
+
+        Widgets.seq(109)
+
+    # mode 0 loads all chats and begins display from end, seq 110-129, data=[["messages",account,name],passkeyBox]
+    elif mode == 0:
+        for i in range(110,130):
+            Widgets.rem_seq(i)   #untested
+        page = 110
+        line = 50
+        password = data[1].get_val()
+        password = sha256_hash(password.encode())
+        hashed_pass = sha256_hash(password)
+        init_vec = b64decode(data[0][0]["init_vec"])
+
+        if not hashed_pass == b64decode(data[0][0]["hashed_key"]):
+            Widgets.seq([16,109])
+        else:
+            data[0][1][2] = data[0][0]
+
+            for message in data[0][0]["msg_data"]:
+                #decrypt text
+                #hashed pass as key
+                text = aes_decrypt(password, b64decode(message["msg"]), init_vec)
+                text = str(message["sent_by"]) + ": " + text
+                
+                #display operations
+                lines = len(text)/55 + 1
+                line_end = (lines*20 + line)
+                if line_end > 310:
+                    line = 50
+                    page += 1
+                    if page > 129:
+                        print("Please expand message database")
+                        exit(-3)
+                else:
+                    line += 20*lines
+
+                Widgets(page,Text(text,10,line,wide=55,fs=12,highl=lines))
+
+            user = data[0][1][0]
+            name = data[0][2]
+    
+            name_string = "Chat with " + name
+
+            for j in range(110, page+1):
+                Widgets(j,Button("Back",530,10,wide=40,fs=8,com=[100,1]))
+                Widgets(j,Message(name_string, halfx-90, 10, fs=20))
+
+            Widgets.seq([page])
 
 
 
 
+"""
 
 #will have to load chats, batch 100-110, 
 #establish 5 at a time, then assign 5 to 200, 5 to 201, etc.
@@ -248,79 +351,19 @@ Widgets(108,Button("^",x=550,y=40,wide=70,com=[1,107]))
 # - chats/messages have a next_true byte?
 
 
+#implement update account
+#Widgets(100,Text("User 1: This is my text box",10,50,wide=55,fs=12, highl=1))
+#Widgets(100,Text("User 2: This is my text box",10,70,wide=55,fs=12))
+#figure out how to do it backwards
+#figure out how password is going to be manipulated, Hk?
+#implement message bar to send messages
 
-
-"""
-
-
-"""
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"""
-def chat_load(data, mode):
-    global account#look for an alternative
-    user = account[0]
-
-    # mode 2 is loading all the chats on Widgets seq 100-108, data = json["messages"]
-    if mode == 2:
-        i = 0
-        for chat in data:
-            if user == chat[user1] or user == chat[user2]:
-                name = chat[user1] if chat[user1] == not user else chat[user2]
-                Widgets(100+(int(i)/5),Widget("",name,x=100,y=50+75*(int(i)%5),wide=100,msgload=2,com=chat[msg_data]))
-                i++
-                if i >= 45:
-                    print("Please expand chat database")
-                    exit(-3)
-        if i == 0:
-            Widgets(100,Widget("Sorry, you have no chats at this time","",halfx-150,10,wide=200,fs=18))
-        
-        Widgets.seq(100,1)
-
-    # mode 1 is getting password, data = msg_data, seq 109
-    elif mode == 1:
-        # get the password
-        passBox = Widget("","",x=250,y=200,wide=100,hidden=1)
-        Widgets(109,Widget("Please enter password for this chat","",halfx-150,10,wide=200,fs=18))
-        Widgets(109,passBox)
-        Widgets(109,Widget("","Continue",x=235,y=320,wide=100,msgload=1,com=data))
-
-        Widgets.seq(109)
-
-    # mode 0 loads all chats and begins display from end, seq 110-129
-    elif mode == 0:
-        for i in range(110,130):
-            Widgets.rem_seq(i)   #untested
-        i = 0
-        for message in data:
-
-
-
-
-
-"""
-
-"""
 "messages": [
         {
             "user1": "admin",
             "user2": "admin2",
             "init_vec": "iy23o8y4ow3iuho==",
+            "hashed_key":"2972dhfioauhe3i2h=",
             "msg_data": [
                 {
                     "sent_by": "admin",

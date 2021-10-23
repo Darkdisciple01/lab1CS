@@ -32,6 +32,12 @@ key should match encoded key for accurate decryption
 returns decoded message
 """
 def aes_decrypt(key, cipher_text, init_vec):
+   
+    key_size = 32
+
+    if len(key) != key_size:
+        print("Improper key size: key size should be: " + str(key_size) + "\n\tkey size is: " + str(len(key)))
+        exit(-1)
 
     cipher = AES.new(key, AES.MODE_CBC, init_vec)
     data = cipher.decrypt(cipher_text)

@@ -4,8 +4,9 @@ from encryption_functions import *
 
 #decrypt_file()
 
-user_database, pass_database = load_file_data()
+user_database, pass_database = load_account_data()
 account = []
+message_data = load_message_data()
 
 
 """
@@ -32,8 +33,9 @@ def mainfunc(seq):
             if not hashed_password == pass_database[index]:
                 Widgets.seq([0,3,16])
             else:
-                account = [user_database[index], pass_database[index]]
-                print(account)
+                account = [user_database[index], pass_database[index],{}]
+                chat_load(message_data, 2, account)
+    
 
     if seq == [0,3,88]:
 
@@ -46,21 +48,22 @@ def mainfunc(seq):
         empty = bool(password == "" or username == "")
 
         if(password == confirm and not empty):
-            key = Random.get_random_bytes(32)
-            password = password.encode()
-            hashed_password = sha256_hash(password)
+            if username in user_database:
+                Widgets.seq([2,3,19])
+            else:
+                key = Random.get_random_bytes(32)
+                password = password.encode()
+                hashed_password = sha256_hash(password)
 
-            add_user(username, hashed_password)
-            user_database, pass_database = load_file_data()
+                add_user(username, hashed_password)
+                user_database, pass_database = load_account_data()
 
-            print("account created: " + str(username))
+                print("account created: " + str(username))
         elif empty:
             Widgets.seq([2,3,18])
         else:
             Widgets.seq([2,3,17])
 
-
-    return
 
 
 
@@ -84,11 +87,14 @@ if x == 0:
     root.mainloop()
 
 if x == 1:
-    #root.withdraw()
-    print("Beginning Testing")
-    Widgets.seq([1,100])
-    root.mainloop()
-    
+    root.withdraw()
+    password = "password"
+    password = sha256_hash(password.encode())
+    init_vec = b64decode("zcpNxgzpubdn2VkboaL2FA==".encode())
+    msg, n = aes_encrypt("This is my message # 2", password, init_vec)
+    msg = b64encode(msg).decode()
+
+    print(msg)
 
 if x == 2:
     root.withdraw()
@@ -111,6 +117,9 @@ if x == 2:
     time.sleep(2)
     print("Decrypted message is: \"" + str(new_data) + "\"")
     print()
+
+
+print(account[2])
 
 
 #encrypt_file()

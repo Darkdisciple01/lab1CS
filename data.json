@@ -20,17 +20,17 @@
     "messages": [
         {
             "user1": "admin",
-            "user2": "admin2",
-            "key": "joeh3y2oih4uo2===",
-            "init_vec": "iy23o8y4ow3iuho==",
+            "user2": "jon",
+            "hashed_key": "c2Qcmfdxn1fY9L6xGjA6/NGQJDpRzth4LKbT2+AU0UY=",
+            "init_vec": "zcpNxgzpubdn2VkboaL2FA==",
             "msg_data": [
                 {
                     "sent_by": "admin",
-                    "msg": "oiwuerioho8734yoig3287=="
+                    "msg": "hliAYP93syd8XzaN1T9mxc3Vjlsri5J6Xzx1qSsrAxU="
                 },
                 {
-                    "sent_by": "admin2",
-                    "msg": "p9823y8og2o8t4=="
+                    "sent_by": "jon",
+                    "msg": "hliAYP93syd8XzaN1T9mxX+QWkg8LBPyTCkrP3HE7sY="
                 }
             ]
         }

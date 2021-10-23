@@ -89,7 +89,7 @@ def remove_user(username, filename='data.json'):
 
 
 
-def load_file_data():
+def load_account_data():
     data = read_file()
 
     user_database = []
@@ -100,6 +100,14 @@ def load_file_data():
         pass_database.append(b64decode(account["password"].encode('utf-8')))
 
     return user_database, pass_database
+
+
+
+
+def load_message_data():
+    data = read_file()
+    return data["messages"]
+
 
 
 
