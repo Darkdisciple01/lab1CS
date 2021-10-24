@@ -63,8 +63,9 @@ def add_user(username, password, filename='data.json'):
         # convert back to json.
         json.dump(file_data, file, indent=4)
 
-
-
+"""
+Finds and removes user with given username
+"""
 def remove_user(username, filename='data.json'):
 
     js  = json.load(open("data.json"))
@@ -148,6 +149,64 @@ def add_message(message, account, filename='data.json'):
     else:
         print("error adding message to database, chat not found")
     
+
+"""
+creates a new chat with given specifications
+key must already be hashed
+"""
+def add_chat(account, username, init_vec, hashed_key, filename='data.json'):
+
+    js = json.load(open(filename))
+
+    b64init_vec = b64encode(init_vec).decode()
+    b64hashed_key = b64encode(hashed_key).decode()
+
+
+    new_data = {"user1": account[0], "user2": username, "init_vec": b64init_vec, "hashed_key": b64hashed_key, "msg_data":[]}
+
+    with open(filename, 'r+') as file:
+        # First we load existing data into a dictionary
+        file_data = json.load(file)
+        # Join new_data with file_data inside users
+        file_data["messages"].append(new_data)  # "users" is the domain where all users' data is stored
+        # Sets file's current position at offset.
+        file.seek(0)
+        # convert back to json.
+        json.dump(file_data, file, indent=4)
+
+
+
+"""
+Deletes the chat between user1 and user2, if it exists
+
+"""
+
+
+def remove_chat(user1, user2, filename = 'data.json'):
+
+    js = json.load(open(filename))
+
+    index = -1
+
+    for i in range(len(js["messages"])):
+        if js["messages"][i]["user1"] == user1 and js["messages"][i]["user2"] == user2:
+            index = i
+        if js["messages"][i]["user1"] == user2 and js["messages"][i]["user2"] == user1:
+            index = i
+
+    if index >= 0:
+        with open(filename, 'r+') as file:
+            # First we load existing data into a dictionary
+            file_data = json.load(file)
+            # Join new_data with file_data inside users
+            file_data["messages"].pop(index)  # "users" is the domain where all users' data is stored
+            # Sets file's current position at offset.
+            file.seek(0)
+            # convert back to json.
+            json.dump(file_data, file, indent=4)
+            file.truncate()
+
+
 
 
 """

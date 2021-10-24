@@ -2,7 +2,7 @@ exec(open("./lab_GUI.py").read())
 from file_operations import *
 from encryption_functions import *
 
-#decrypt_file()
+decrypt_file()
 
 user_database, pass_database = load_account_data()
 account = []
@@ -84,7 +84,6 @@ def mainfunc(seq):
 
             else:
                 message = get_message()
-                print("Message is: "+ str(message))
                 hashed_password = sha256_hash(password.encode())
                 init_vec = b64decode(account[2]["init_vec"])
 
@@ -97,6 +96,44 @@ def mainfunc(seq):
         #reload messages (use function in lab_GUI.py)
         # - similar to other function
 
+    if seq == [88,90]:
+
+        """On pressing |New Chat| to create a new chat"""
+
+        username, password = get_username()
+
+        if username == "" or password == "":
+            Widgets.seq(5)
+        else:
+            if not username in user_database:
+                Widgets.seq([5,15])
+            elif username == account[0]:
+                Widgets.seq([5,20])
+            else:
+                # check if chat already exists
+                flag = 0
+                for chat in message_data:
+                    if chat["user1"] == account[0] and chat["user2"] == username:
+                        flag = 1
+                        Widgets.seq([5,21])
+                    if chat["user2"] == account[0] and chat["user1"] == username:
+                        flag = 1
+                        Widgets.seq([5,21])
+                
+                if flag == 0:
+                    init_vec = Random.get_random_bytes(AES.block_size)
+                    doubly_hashed_password = sha256_hash(sha256_hash(password.encode()))
+                    add_chat(account, username, init_vec, doubly_hashed_password)
+                    # reload chats
+                    message_data = load_message_data()
+                    chat_load(message_data, 2, account)
+    
+    if seq == [88,91]:
+
+        """On pressing |Back| to leave a chat"""
+
+        chat_load(load_message_data(), 2, account)
+
 
 
 
@@ -105,8 +142,6 @@ Different operation modes
 0 for GUI, 1 for Testing, 2 for Progress Display
 
 """
-
-
 
 
 import sys
@@ -122,8 +157,6 @@ if x == 0:
 if x == 1:
     root.withdraw()
     
-    print(b64decode("zcpNxgzpubdn2VkboaL2FA=="))
-
 if x == 2:
     root.withdraw()
     print("Beginning Progress Display")
@@ -147,4 +180,4 @@ if x == 2:
     print()
 
 
-#encrypt_file()
+encrypt_file()
