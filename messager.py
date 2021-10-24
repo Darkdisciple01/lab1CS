@@ -16,7 +16,7 @@ Main loop for GUI
 
 
 def mainfunc(seq):
-    global userBox, passBox, user_database, pass_database, account
+    global userBox, passBox, user_database, pass_database, account, message_data
     if seq == [1,88]:
 
         """On pressing |continue| to login"""
@@ -34,6 +34,7 @@ def mainfunc(seq):
                 Widgets.seq([0,3,16])
             else:
                 account = [user_database[index], pass_database[index],{}]
+                # Loads the user's chats
                 chat_load(message_data, 2, account)
     
 
@@ -51,7 +52,6 @@ def mainfunc(seq):
             if username in user_database:
                 Widgets.seq([2,3,19])
             else:
-                key = Random.get_random_bytes(32)
                 password = password.encode()
                 hashed_password = sha256_hash(password)
 
@@ -63,6 +63,39 @@ def mainfunc(seq):
             Widgets.seq([2,3,18])
         else:
             Widgets.seq([2,3,17])
+
+
+    if seq == [88,89]:
+
+        """On pressing |send| to send a message"""
+
+        password = get_password()
+
+        if password == "":
+            Widgets.seq(4)
+        else:
+            hashed_password = sha256_hash(password.encode())
+            doubly_hashed_password = sha256_hash(hashed_password)
+
+            compare_hash = b64decode(account[2]["hashed_key"])
+
+            if not doubly_hashed_password == compare_hash:
+                Widgets.seq([4,16])
+
+            else:
+                message = get_message()
+                print("Message is: "+ str(message))
+                hashed_password = sha256_hash(password.encode())
+                init_vec = b64decode(account[2]["init_vec"])
+
+                enc_message, n = aes_encrypt(message, hashed_password, init_vec)
+                add_message(enc_message, account) # account includes information on the chat
+                
+                message_data = load_message_data()
+                reload_messages(account, hashed_password, init_vec)
+
+        #reload messages (use function in lab_GUI.py)
+        # - similar to other function
 
 
 
@@ -88,13 +121,8 @@ if x == 0:
 
 if x == 1:
     root.withdraw()
-    password = "password"
-    password = sha256_hash(password.encode())
-    init_vec = b64decode("zcpNxgzpubdn2VkboaL2FA==".encode())
-    msg, n = aes_encrypt("This is my message # 2", password, init_vec)
-    msg = b64encode(msg).decode()
-
-    print(msg)
+    
+    print(b64decode("zcpNxgzpubdn2VkboaL2FA=="))
 
 if x == 2:
     root.withdraw()
@@ -117,9 +145,6 @@ if x == 2:
     time.sleep(2)
     print("Decrypted message is: \"" + str(new_data) + "\"")
     print()
-
-
-print(account[2])
 
 
 #encrypt_file()

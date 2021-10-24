@@ -34,6 +34,7 @@ _________________________________________________________________
 
 """
 The Widget class is designed to more easily customize and initialize widgets from Tkinter. Widgets are placed at inputs x and y.
+Each of its children correspond to a data type in the Tkinter library
 """
 
 class Widget:
@@ -85,11 +86,14 @@ class Input_Box(Widget):
         super().__init__(entry, frame, x, y)
         self.data.append(entry_var)
 
+    def configure(self, wide):
+        self.data[0].configure(width=wide)
+
     def get_val(self):
         return self.data[5].get()
 
     def clear(self):
-        return
+        self.data[5].set("")
 
 
 class Text(Widget):
@@ -137,15 +141,40 @@ class Widgets:
 
     @staticmethod
     def rem_seq(n):
-        for widget in widgets:
-            if widget[0] == n:
-                widgets.remove(widget)
+        x = len(widgets)
+        c = 0
+        for i in range(x):
+            if i-c < x-c and widgets[i-c][0] == n:
+                widgets.pop(i-c)
+                c += 1
+        c = 0
 
 
 """
 _________________________________________________________________
 
 TKINTER SETUP
+
+
+Page designation:
+
+0           login page
+1           message board helper widgets
+2           create user
+3           username and password input
+4           re-enter password
+5-14        *unused* designated for page operations
+15-16       login errors
+17-19       create user errors
+20-30       *unused* designated for errors
+30-87       *undesignated*
+88          no widgets contained, used in mainloop as a general indicator
+89          no widgets contained, indicates message needs to be sent
+90-99       *unused* designated for indicators
+100-108     displays chats (<45)
+109         enter password for chat
+110-129     displays messages in chat
+
 _________________________________________________________________
 """
 
@@ -174,24 +203,20 @@ Widgets(16,Message("incorrect password, try again",x=220,y=250,fs=10,wide=200))
 """
 Page 1
 message board
+other Widgets implemented in Pages 100-129
 """
 
 # title
-Widgets(1,Message("Messages",halfx-50,10,color="darkgray",wide=200,high=40,fs=20))
+Widgets(1,Message("Messages",halfx-75,10,color="darkgray",wide=200,high=40,fs=20))
 
 # log out
 Widgets(1,Button("Logout",530,10,wide=40,fs=8,com=[0,3]))
 
-
 # create new chat
 
-
-# display chats - buttons with names of recipients
-# have to load chats, have a function with Widgets within range (300,inf)?
-
-
-# error for if no messages
-
+# send new message box
+new_message = Input_Box(30,350)
+new_message.configure(45)
 
 
 """
@@ -233,48 +258,79 @@ Widgets(3,passBox)
 
 
 """
-Pages 100-110
+Page 4
+re enter password (until signatures)
+"""
+
+chat_password = Input_Box(x=205,y=200,wide=100,hidden=1)
+Widgets(4,Message("Please enter the password for this chat",halfx-125,50,wide=250,fs=18))
+Widgets(4,chat_password)
+Widgets(4,Button("Continue",x=235,y=320,wide=100,com=[88,89]))
+Widgets(4,Button("Back",530,10,wide=40,fs=8,com=[110]))
+
+
+
+"""
+Pages 100-108
 chat display
+
+Page 109
+enter password for chat
+
+Pages 110-129
+display messages inside of chat
 """
 
 
-def chat_load(data, mode, account=[]):
+"""
+Loads chats and displays them on the screen
+Upon selecting a chat, prompts for a password
+If password is correct, displays all messages corresponding to the chat
 
+no returns
+after login, chat_load(data.json["messages"], 2, [user, pass, {}]) is called
+function updates account to: [user, pass, data.json["messages"][i]["msg_chat"]
+  after correct password is entered
+"""
+
+def chat_load(data, mode, account=[]):
+    global new_message
     # mode 2 is loading all the chats on Widgets seq 100-108, data = json["messages"]
     if mode == 2:
         user = account[0] 
-        Widgets.rem_seq(100)
-
-        Widgets(100,Button("^",x=550,y=40,wide=70,com=[1,100]))
-        Widgets(100,Button("v",x=550,y=350,wide=70,com=[1,101]))
-
-        for i in range(101,108):
+        for i in range(100,109):
             Widgets.rem_seq(i)
-            Widgets(i,Button("^",x=550,y=40,wide=70,com=[1,i-1]))
-            Widgets(i,Button("v",x=550,y=350,wide=70,com=[1,i+1]))
 
-        Widgets.rem_seq(108)
-    
-        Widgets(108,Button("^",x=550,y=40,wide=70,com=[1,107]))
-        Widgets(108,Button("v",x=550,y=350,wide=70,com=[1,108]))
+        page = 100
+        Widgets(100,Button("^",x=550,y=40,wide=70,com=[1,100]))
 
+        new_button = ""
         i = 0
         for chat in data:
             if user == chat["user1"] or user == chat["user2"]:
                 name = chat["user1"] if not chat["user1"] == user else chat["user2"]
-                new_button = Button(name,x=40,y=50+75*(int(i)%5),wide=200,msgload=2,com=[chat,account,name])
+                new_button = Button(name,x=40,y=75+65*(int(i)%5),wide=200,msgload=2,com=[chat,account,name])
                 new_button.configure(wide=35,high=1)
-                Widgets(100+(int(i)/5),new_button)
+                Widgets(int(100+i/5),new_button)
                 i+=1
+                if not page == int(100+i/5):
+                    page += 1
+                    Widgets.rem_seq(page)
+                    Widgets(page-1,Button("v",x=550,y=350,wide=70,com=[1,page]))
+                    Widgets(page,Button("^",x=550,y=40,wide=70,com=[1,page-1]))
+
                 if i >= 45:
                     print("Please expand chat database")
                     exit(-3)
+
+        Widgets(page,Button("v",x=550,y=350,wide=70,com=[1,page]))
+
         if i == 0:
-            Widgets(100,Widget("Sorry, you have no chats at this time","",halfx-150,10,wide=200,fs=18))
+            Widgets(100,Message("Sorry, you have no chats at this time",halfx-135,10,wide=200,fs=18))
 
         Widgets.seq([100,1])
 
-    # mode 1 is getting password, data = ["messages",account,name], seq 109
+    # mode 1 is getting password, data = [chat,account,name], seq 109
     elif mode == 1:
         # get the password
         passkeyBox = Input_Box(x=205,y=200,wide=100,hidden=1)
@@ -285,12 +341,13 @@ def chat_load(data, mode, account=[]):
 
         Widgets.seq(109)
 
-    # mode 0 loads all chats and begins display from end, seq 110-129, data=[["messages",account,name],passkeyBox]
+    # mode 0 loads all chats and begins display from end, seq 110-129, data=[[chat,account,name],passkeyBox]
     elif mode == 0:
         for i in range(110,130):
-            Widgets.rem_seq(i)   #untested
+            Widgets.rem_seq(i)
         page = 110
         line = 50
+        start = 1
         password = data[1].get_val()
         password = sha256_hash(password.encode())
         hashed_pass = sha256_hash(password)
@@ -299,7 +356,11 @@ def chat_load(data, mode, account=[]):
         if not hashed_pass == b64decode(data[0][0]["hashed_key"]):
             Widgets.seq([16,109])
         else:
+            print("loading chat")
             data[0][1][2] = data[0][0]
+            print(data[0][1][2])
+
+            Widgets(110,Button("^",x=550,y=40,wide=70,com=[110]))
 
             for message in data[0][0]["msg_data"]:
                 #decrypt text
@@ -308,55 +369,153 @@ def chat_load(data, mode, account=[]):
                 text = str(message["sent_by"]) + ": " + text
                 
                 #display operations
-                lines = len(text)/55 + 1
+                lines = int(len(text)/55 + 1)
                 line_end = (lines*20 + line)
                 if line_end > 310:
+                    Widgets(page,Button("v",x=550,y=350,wide=70,com=[page+1]))
                     line = 50
                     page += 1
+                    Widgets(page,Button("^",x=550,y=40,wide=70,com=[page-1]))
                     if page > 129:
                         print("Please expand message database")
                         exit(-3)
                 else:
-                    line += 20*lines
+                    if start == 1:
+                        start = 0
+                    else:
+                        line += 20
 
                 Widgets(page,Text(text,10,line,wide=55,fs=12,highl=lines))
+                line += (lines-1)*20
 
-            user = data[0][1][0]
+            Widgets(page,Button("v",x=550,y=350,wide=70,com=[page]))
+
+            #user = data[0][1][0]
             name = data[0][2]
     
             name_string = "Chat with " + name
 
             for j in range(110, page+1):
-                Widgets(j,Button("Back",530,10,wide=40,fs=8,com=[100,1]))
+                Widgets(j,Button("Back",540,10,wide=40,fs=8,com=[100,1]))
                 Widgets(j,Message(name_string, halfx-90, 10, fs=20))
+                Widgets(j,new_message)
+                Widgets(j,Button("Send",460,350,wide=40,fs=8,com=[88,89]))
 
             Widgets.seq([page])
+
+
+"""
+Returns the contents of the send bar
+Only called after send is pressed
+Clears the content of the send bar
+"""
+
+def get_message():
+    global new_message
+    temp = new_message.get_val()
+    new_message.clear()
+    return temp
+
+"""
+Returns the contents of chat_password
+ - password entry box found in page 4
+Clears the content of chat_password
+"""
+def get_password():
+    global chat_password
+    temp = chat_password.get_val()
+    chat_password.clear()
+    return temp
+
+
+
+"""
+Loads messages in the range: pages 110-129
+Assumes access has already been granted
+Assumes account already points to current chat (hence reload)
+"""
+def reload_messages(account, password, init_vec):
+    global new_message
+    for i in range(110,130):
+        Widgets.rem_seq(i)
+    page = 110
+    line = 50
+    start = 1
+
+    Widgets(110,Button("^",x=550,y=40,wide=70,com=[110]))
+
+    js = json.load(open('data.json'))
+ 
+    index = -1
+
+    for i in range(len(js["messages"])):
+        if js["messages"][i]["user1"] == account[2]["user1"] and js["messages"][i]["user2"] == account[2]["user2"]:
+            index = i
+
+    if index == -1:
+        print("MAJOR LOGICAL ERROR IN RELOAD MESSAGES/ACCOUNT")
+        exit(-5)
+    
+    msg_data = js["messages"][index]["msg_data"]
+
+    for message in msg_data:
+        #decrypt text
+        text = aes_decrypt(password, b64decode(message["msg"]), init_vec)
+        text = str(message["sent_by"]) + ": " + text
+
+        #display operations
+        lines = int(len(text)/55 + 1)
+        line_end = (lines*20 + line)
+        if line_end > 310:
+            Widgets(page,Button("v",x=550,y=350,wide=70,com=[page+1]))
+            line = 50
+            page += 1
+            Widgets(page,Button("^",x=550,y=40,wide=70,com=[page-1]))
+            if page > 129:
+                print("Please expand message database")
+                exit(-3)
+        else:
+            if start == 1:
+                 start = 0
+            else:
+                line += 20
+
+        Widgets(page,Text(text,10,line,wide=55,fs=12,highl=lines))
+        line += (lines-1)*20
+
+
+    Widgets(page,Button("v",x=550,y=350,wide=70,com=[page]))
+
+    user = account[0]
+    name = js["messages"][index]["user1"] if not js["messages"][index]["user1"] == user else js["messages"][index]["user2"]
+
+    name_string = "Chat with " + name
+
+    for j in range(110, page+1):
+        Widgets(j,Button("Back",540,10,wide=40,fs=8,com=[100,1]))
+        Widgets(j,Message(name_string, halfx-90, 10, fs=20))
+        Widgets(j,new_message)
+        Widgets(j,Button("Send",460,350,wide=40,fs=8,com=[88,89]))
+
+    Widgets.seq([page])
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 """
-
-#will have to load chats, batch 100-110, 
-#establish 5 at a time, then assign 5 to 200, 5 to 201, etc.
-# - done in load
-#
-#messages will appear as buttons with the name of person to message
-
-#on click to messages when logging in, runs load_chats - each chat with the dictionary of message data
-
-#chat button: displays name of other user, on click runs load_messages unpacking dictionary
-# - password prompt as key for the encryption
-# - until signatures?
-# - chats/messages have a next_true byte?
-
-
-#implement update account
-#Widgets(100,Text("User 1: This is my text box",10,50,wide=55,fs=12, highl=1))
-#Widgets(100,Text("User 2: This is my text box",10,70,wide=55,fs=12))
-#figure out how to do it backwards
-#figure out how password is going to be manipulated, Hk?
-#implement message bar to send messages
 
 "messages": [
         {
@@ -376,9 +535,6 @@ def chat_load(data, mode, account=[]):
             ]
         }
     ]
-
-
-
 
 """
 

@@ -88,7 +88,10 @@ def remove_user(username, filename='data.json'):
         file.truncate()
 
 
-
+"""
+returns databases for "users" part of data
+each index of either database represents a user
+"""
 def load_account_data():
     data = read_file()
 
@@ -103,7 +106,9 @@ def load_account_data():
 
 
 
-
+"""
+returns "messages" part of data
+"""
 def load_message_data():
     data = read_file()
     return data["messages"]
@@ -112,43 +117,61 @@ def load_message_data():
 
 
 
+"""
+adds message to the chat opened in "account"
+message must be encrypted
+"""
+
+def add_message(message, account, filename='data.json'):
+
+    b64message = b64encode(message).decode()
+    new_data = {"sent_by": account[0], "msg": b64message}
+
+    js = json.load(open(filename))
+
+    index = -1
+
+    for i in range(len(js["messages"])):
+        if js["messages"][i]["user1"] == account[2]["user1"] and js["messages"][i]["user2"] == account[2]["user2"]:
+            index = i
+
+    if not index == -1:
+        with open(filename, 'r+') as file:
+            # First we load existing data into a dictionary
+            file_data = json.load(file)
+            # Join new_data with file_data inside users
+            file_data["messages"][index]["msg_data"].append(new_data)  # "users" is the domain where all users' data is stored
+            # Sets file's current position at offset.
+            file.seek(0)
+            # convert back to json.
+            json.dump(file_data, file, indent=4)
+    else:
+        print("error adding message to database, chat not found")
+    
 
 
 """
-def add_user(username, password, key, init_vec, filename='data.json'):
 
-    # Searching for coincidences
-    js  = json.load(open(filename))
-
-    for user in js["users"]:
-        if user["username"] == str(username):
-            raise TypeError(str(username) + " is already used as a name account")
-            break
-
-    # Creating the dictionary
-
-    password_b64 = b64encode(password).decode('utf-8')
-    key_b64 = b64encode(key).decode('utf-8')
-    init_vec_b64 = b64encode(init_vec).decode('utf-8')
-
-    new_data = {"username": str(username),
-            "password": (password_b64), "key": (key_b64), "init_vec": (init_vec_b64)}
-
-    with open(filename, 'r+') as file:
-        # First we load existing data into a dictionary
-        file_data = json.load(file)
-        # Join new_data with file_data inside users
-        file_data["users"].append(new_data)  # "users" is the domain where all users' data is stored
-        # Sets file's current position at offset.
-        file.seek(0)
-        # convert back to json.
-        json.dump(file_data, file, indent=4)
-
-
-
-
-
+"messages": [
+        {
+            "user1": "admin",
+            "user2": "admin2",
+            "init_vec": "iy23o8y4ow3iuho==",
+            "hashed_key":"2972dhfioauhe3i2h=",
+            "msg_data": [
+                {
+                    "sent_by": "admin",
+                    "msg": "oiwuerioho8734yoig3287=="
+                },
+                {
+                    "sent_by": "admin2",
+                    "msg": "p9823y8og2o8t4=="
+                }
+            ]
+        }
+    ]
 
 """
+
 
 

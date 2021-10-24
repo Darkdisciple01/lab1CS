@@ -17,5 +17,8 @@
 
 [ ] implement the sending of a message (along with reloading the chat)
 
-[ ] implement up and down arrows in messages when necessary
+[X] implement up and down arrows in messages when necessary
 
+[ ] change password to the chat? or delete chat
+
+[ ] implement a page feature in account
