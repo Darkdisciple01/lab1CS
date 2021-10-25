@@ -156,7 +156,8 @@ if x == 0:
 
 if x == 1:
     root.withdraw()
-    
+    remove_chat("admin", "jon")
+
 if x == 2:
     root.withdraw()
     print("Beginning Progress Display")

@@ -25,7 +25,7 @@ SYSTEM REQ
 //Use pycrypto
 
 user | 2\3;423]\[4;2\3]1;
- - encrypt password, compare encrypted
+ - hash password, compare hashed
 
  - gain access with proper password
 

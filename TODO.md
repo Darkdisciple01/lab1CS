@@ -20,3 +20,5 @@
 [X] implement up and down arrows in messages when necessary
 
 [X] implement delete chat
+
+[ ] salt for hashes

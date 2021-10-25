@@ -384,7 +384,7 @@ def chat_load(data, mode, account=[]):
         Widgets(page,Button("v",x=550,y=350,wide=70,com=[1,page]))
 
         if i == 0:
-            Widgets(100,Message("Sorry, you have no chats at this time",halfx-135,10,wide=200,fs=18))
+            Widgets(100,Message("Sorry, you have no chats at this time",halfx-110,175,wide=200,fs=18))
 
         Widgets.seq([100,1])
 
