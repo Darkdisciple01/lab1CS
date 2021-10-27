@@ -7,7 +7,7 @@
 
 [X] create messages GUI !!!
 
-[ ] write project report
+[X] write project report
 
 [X] include hash function
 
