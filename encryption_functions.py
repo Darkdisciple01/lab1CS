@@ -83,6 +83,7 @@ def decrypt_file(filename='data.json'):
 """
 Creates sha256 hash of string
 password must be encoded
+returns bytes object
 """
 
 def sha256_hash(password):

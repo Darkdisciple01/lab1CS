@@ -12,6 +12,14 @@ message_data = load_message_data()
 """
 Main loop for GUI
 
+GUI operates by displaying one or multiple pages of "Widget"s
+Upon the pressing of a button, different pages can be displayed
+Since the GUI operates in a loop, we must intercept the loop to perform operations
+
+Parameters: pages displayed, in list format
+Performs operations based on the pages displayed
+No returns
+
 """
 
 
@@ -19,7 +27,12 @@ def mainfunc(seq):
     global userBox, passBox, user_database, pass_database, account, message_data
     if seq == [1,88]:
 
-        """On pressing |continue| to login"""
+        """
+        On pressing |continue| to login
+        Parameters: gets values of username and password boxes
+        Checks if user is in database with entered password, if so, logs in, otherwise displays
+          the relevant error message
+        """
 
         username = userBox.get_val()
         password = passBox.get_val()
@@ -33,6 +46,7 @@ def mainfunc(seq):
             if not hashed_password == pass_database[index]:
                 Widgets.seq([0,3,16])
             else:
+                # hashed passwords match, load account
                 account = [user_database[index], pass_database[index],{}]
                 # Loads the user's chats
                 chat_load(message_data, 2, account)
@@ -40,7 +54,12 @@ def mainfunc(seq):
 
     if seq == [0,3,88]:
 
-        """On pressing |continue| to create new user"""
+        """
+        On pressing |continue| to create new user
+        Parameters: gets values of username, password, and confirm password boxes
+        Ensures proper format and no repeated username, then creates an account. Includes
+          error handling
+        """
 
         username = userBox.get_val()
         password = passBox.get_val()
@@ -67,21 +86,27 @@ def mainfunc(seq):
 
     if seq == [88,89]:
 
-        """On pressing |send| to send a message"""
+        """
+        On pressing |send| to send a message
+        Parameters: user-entered password, message in message box
+        Checks validity of password, adds message to current chat
+        """
 
-        password = get_password()
+        password = get_password() # returns password, clears password field box
 
         if password == "":
-            Widgets.seq(4)
+            Widgets.seq(4) # ask for password
         else:
             hashed_password = sha256_hash(password.encode())
             doubly_hashed_password = sha256_hash(hashed_password)
 
-            compare_hash = b64decode(account[2]["hashed_key"])
+            compare_hash = b64decode(account[2]["hashed_key"]) # account[2] stores current chat
 
+            # ensures password is correct
             if not doubly_hashed_password == compare_hash:
                 Widgets.seq([4,16])
 
+            # if password is correct, encrypts message and adds message into the chat
             else:
                 message = get_message()
                 hashed_password = sha256_hash(password.encode())
@@ -93,12 +118,16 @@ def mainfunc(seq):
                 message_data = load_message_data()
                 reload_messages(account, hashed_password, init_vec)
 
-        #reload messages (use function in lab_GUI.py)
-        # - similar to other function
+
 
     if seq == [88,90]:
 
-        """On pressing |New Chat| to create a new chat"""
+        """
+        On pressing |New Chat| to create a new chat
+        Parameters: gets name of who to chat with, password of new chat
+        Creates new chat between user logged in and user specified. Chat password
+          is created from input specified password.
+        """
 
         username, password = get_username()
 
@@ -130,7 +159,12 @@ def mainfunc(seq):
     
     if seq == [88,91]:
 
-        """On pressing |Back| to leave a chat"""
+        """
+        On pressing |Back| to leave a chat
+        No parameters
+        Reloads chats to update the current chat. This supports the (encrypted) message
+          data staying within the data of the chat button
+        """
 
         chat_load(load_message_data(), 2, account)
 
@@ -139,13 +173,11 @@ def mainfunc(seq):
 
 """
 Different operation modes
-0 for GUI, 1 for Testing, 2 for Progress Display
-
+0,NULL for GUI, 1 for Testing
 """
 
 
 import sys
-import time
 x = (int)(sys.argv[1]) if (len(sys.argv)>1) else 0
 
 if x == 0:
@@ -156,29 +188,6 @@ if x == 0:
 
 if x == 1:
     root.withdraw()
-    remove_chat("admin", "jon")
-
-if x == 2:
-    root.withdraw()
-    print("Beginning Progress Display")
-    print()
-    key = Random.get_random_bytes(32)
-    print("Generating key: " + str(key))
-    print("Running AES Encrypt, please enter message to encrypt:")
-    print()
-    data = str(input())
-    cipher_text, init_vec = aes_encrypt(data, key)
-    time.sleep(2)
-    print()
-    print("Encrypted message: " + str(cipher_text))
-    print()
-    print("Attempting to decrypt message")
-    new_data = aes_decrypt(key, cipher_text, init_vec)
-    time.sleep(1)
-    print()
-    time.sleep(2)
-    print("Decrypted message is: \"" + str(new_data) + "\"")
-    print()
-
+    remove_chat("Alice", "Bob")
 
 encrypt_file()

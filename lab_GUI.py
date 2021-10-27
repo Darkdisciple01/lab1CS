@@ -265,7 +265,8 @@ Widgets(18,Message("please enter username and password",230,300,fs=10,wide=200))
 # error for username already taken
 Widgets(19,Message("username already taken",230,300,fs=10,wide=200))
 
-
+# back
+Widgets(2,Button("Back",530,10,wide=40,fs=8,com=[0,3]))
 
 """
 Page 3
@@ -332,23 +333,14 @@ Widgets(21,Message("chat already exists",x=200,y=250,fs=10,wide=200))
 
 
 """
-Pages 100-108
-chat display
-
-Page 109
-enter password for chat
-
-Pages 110-129
-display messages inside of chat
-
 Loads chats and displays them on the screen
 Upon selecting a chat, prompts for a password
 If password is correct, displays all messages corresponding to the chat
 
 no returns
 after login, chat_load(data.json["messages"], 2, [user, pass, {}]) is called
-function updates account to: [user, pass, data.json["messages"][i]["msg_chat"]
-  after correct password is entered
+after correct password is entered function updates account to: 
+                                [user, pass, data.json["messages"][i]["msg_chat"]
 """
 
 def chat_load(data, mode, account=[]):
@@ -446,9 +438,7 @@ def chat_load(data, mode, account=[]):
 
             Widgets(page,Button("v",x=550,y=350,wide=70,com=[page]))
 
-            #user = data[0][1][0]
-            name = data[0][2]
-    
+            name = data[0][2]    
             name_string = "Chat with " + name
 
             for j in range(110, page+1):

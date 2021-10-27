@@ -17,11 +17,6 @@ SYSTEM REQ
  - AES CBC
 
 
-
-
-
-
-
 //Use pycrypto
 
 user | 2\3;423]\[4;2\3]1;
@@ -32,24 +27,12 @@ user | 2\3;423]\[4;2\3]1;
  - access lets you decrypt your messages
 
 
-
-
-
-
 use random for key generation???
 or use passwords combined
 
 
 base64 encode the encrypted data before inserting into file
  - lose some efficiency in storage, but program doesn't crash
-
-
-
-
-
-
-
-
 
 
 
