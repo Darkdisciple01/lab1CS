@@ -21,22 +21,22 @@
 
 [X] implement delete chat
 
-[ ] salt for hashes
-
-[ ] digital signatures
+[X] salt for hashes
 
 [X] removing user removes all their chats?? "delete\_user"??
 
-[ ] fix lines tkinter
+[X] fix lines tkinter
 
 [X] ensure data integrity
 
-[ ] remove need for passwords to the chat
+[ ] remove need for passwords to the chat (digital signatures)
      - figure out how to generate the encryption key in Gamal (each time)
 
-[ ] AES CTR
-     - USE NONCE LOCALLY TO THE MESSAGE - DONT REPEAT NONCE/KEY PAIR
-     - THEN PUSH!!!
+[X] AES CTR
+
+[ ] If decide to use authority, put files into folder, separate GUI class and implementation?
+
+[ ] Packages?
 
 
 
@@ -46,7 +46,7 @@ Questions:
  - Should we use counters for CTR
  - Should we introduce an authority for key exchange
    - if so how would that work
- - do we need to use HMAC instead of SHA256
+ - do we need to use HMAC instead of SHA256 for backups
 
 
-!
+

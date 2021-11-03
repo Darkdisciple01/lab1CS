@@ -165,6 +165,16 @@ Different operation modes
 0,NULL for GUI, 1 for Testing
 """
 
+
+def get_lines(text):
+    text_widget = tk.Text(None,  width=55, height = 10)
+    text_widget.configure(font=("Helvetica "+str(12)))
+    text_widget.insert(tk.END, text)
+
+    return text_widget.index('end')
+
+
+
 import sys
 x = (int)(sys.argv[1]) if (len(sys.argv)>1) else 0
 
@@ -176,8 +186,14 @@ if x == 0:
 
 if x == 1:
     root.withdraw()
-    delete_user("a") 
-    
+
+
+
+
+
+
+
+
 
 
 add_backup()

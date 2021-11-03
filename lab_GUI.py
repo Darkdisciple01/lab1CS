@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter.font as tkFont
 
 """
 _________________________________________________________________
@@ -105,7 +106,13 @@ class Text(Widget):
         txt.insert(tk.END, text)
         txt.configure(font=("Helvetica "+str(fs)))
         super().__init__(txt, frame, x, y)
-
+    
+    @staticmethod
+    def get_lines(text):
+        helv12 = tkFont.Font(family='Helvetica',
+        size=12)
+        pixels = helv12.measure(text)
+        return int(pixels/495) + 1
 
 """
 The Widgets class organizes and calls on "events" or different pages. The home page is denoted as page 0. The seq function accepts input of either a single number or an array of numbers, and runs those pages on the screen.
@@ -417,8 +424,8 @@ def chat_load(data, mode, account=[]):
                 text = str(message["sent_by"]) + ": " + text
                 
                 #display operations
-                lines = int(len(text)/55 + 1)
-                line_end = (lines*20 + line)
+                lines = Text.get_lines(text)
+                line_end = ((lines-1)*17 + 20 + line)
                 if line_end > 310:
                     Widgets(page,Button("v",x=550,y=350,wide=70,com=[page+1]))
                     line = 50
@@ -434,7 +441,7 @@ def chat_load(data, mode, account=[]):
                         line += 20
 
                 Widgets(page,Text(text,10,line,wide=55,fs=12,highl=lines))
-                line += (lines-1)*20
+                line += (lines-1)*17
 
             Widgets(page,Button("v",x=550,y=350,wide=70,com=[page]))
 
@@ -521,8 +528,8 @@ def reload_messages(account, password):
         text = str(message["sent_by"]) + ": " + text
 
         #display operations
-        lines = int(len(text)/55 + 1)
-        line_end = (lines*20 + line)
+        lines = Text.get_lines(text)
+        line_end = ((lines-1)*17 + 20 + line)
         if line_end > 310:
             Widgets(page,Button("v",x=550,y=350,wide=70,com=[page+1]))
             line = 50
@@ -538,7 +545,7 @@ def reload_messages(account, password):
                 line += 20
 
         Widgets(page,Text(text,10,line,wide=55,fs=12,highl=lines))
-        line += (lines-1)*20
+        line += (lines-1)*17
 
 
     Widgets(page,Button("v",x=550,y=350,wide=70,com=[page]))
