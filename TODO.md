@@ -22,3 +22,18 @@
 [X] implement delete chat
 
 [ ] salt for hashes
+
+[ ] digital signatures
+
+[X] removing user removes all their chats?? "delete\_user"??
+
+[ ] fix lines tkinter
+
+[X] ensure data integrity
+
+[ ] remove need for passwords to the chat
+     - figure out how to generate the encryption key in Gamal (each time)
+
+[ ] AES CTR
+     - USE NONCE LOCALLY TO THE MESSAGE - DONT REPEAT NONCE/KEY PAIR
+     - THEN PUSH!!!!

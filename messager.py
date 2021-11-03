@@ -1,8 +1,13 @@
 exec(open("./lab_GUI.py").read())
 from file_operations import *
 from encryption_functions import *
+from backup_protocol import *
 
-decrypt_file()
+
+corruption = check_corruption(root = root)
+if corruption == 0:
+    exit(0)
+
 
 user_database, pass_database = load_account_data()
 account = []
@@ -110,13 +115,12 @@ def mainfunc(seq):
             else:
                 message = get_message()
                 hashed_password = sha256_hash(password.encode())
-                init_vec = b64decode(account[2]["init_vec"])
 
-                enc_message, n = aes_encrypt(message, hashed_password, init_vec)
-                add_message(enc_message, account) # account includes information on the chat
+                enc_message, nonce = aes_encrypt(message, hashed_password)
+                add_message(enc_message, account, nonce) # account includes information on the chat
                 
                 message_data = load_message_data()
-                reload_messages(account, hashed_password, init_vec)
+                reload_messages(account, hashed_password)
 
 
 
@@ -150,9 +154,8 @@ def mainfunc(seq):
                         Widgets.seq([5,21])
                 
                 if flag == 0:
-                    init_vec = Random.get_random_bytes(AES.block_size)
                     doubly_hashed_password = sha256_hash(sha256_hash(password.encode()))
-                    add_chat(account, username, init_vec, doubly_hashed_password)
+                    add_chat(account, username, doubly_hashed_password)
                     # reload chats
                     message_data = load_message_data()
                     chat_load(message_data, 2, account)
@@ -187,6 +190,8 @@ if x == 0:
 
 if x == 1:
     root.withdraw()
-    
+    remove_chat("a","j") 
 
-encrypt_file()
+add_backup()
+
+

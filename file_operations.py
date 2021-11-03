@@ -15,18 +15,13 @@ def read_file():
         data = json.load(json_file)
 
         """
-        ----------------------------------------------------------
-        Printing nested dictionary as a key-value pair:
-        ----------------------------------------------------------
-        
-                for i in data:
-                    print("Username:", i['username'])
-                    print("Password", i['password'])
-                    print()
-        
-        ----------------------------------------------------------
-        username, password are examples of values in the JSON file
-        ----------------------------------------------------------    
+        Basic structure of the data.json file 
+        -------------------------------------------
+        {
+        "users": [],
+        "messages":[]
+        }
+        -------------------------------------------
         """
         return data
 
@@ -123,10 +118,11 @@ adds message to the chat opened in "account"
 message must be encrypted
 """
 
-def add_message(message, account, filename='data.json'):
+def add_message(message, account, nonce, filename='data.json'):
 
     b64message = b64encode(message).decode()
-    new_data = {"sent_by": account[0], "msg": b64message}
+    b64nonce = b64encode(nonce).decode()
+    new_data = {"sent_by": account[0], "msg": b64message, "nonce": b64nonce}
 
     js = json.load(open(filename))
 
@@ -154,15 +150,13 @@ def add_message(message, account, filename='data.json'):
 creates a new chat with given specifications
 key must already be hashed
 """
-def add_chat(account, username, init_vec, hashed_key, filename='data.json'):
+def add_chat(account, username, hashed_key, filename='data.json'):
 
     js = json.load(open(filename))
 
-    b64init_vec = b64encode(init_vec).decode()
     b64hashed_key = b64encode(hashed_key).decode()
 
-
-    new_data = {"user1": account[0], "user2": username, "init_vec": b64init_vec, "hashed_key": b64hashed_key, "msg_data":[]}
+    new_data = {"user1": account[0], "user2": username, "hashed_key": b64hashed_key, "msg_data":[]}
 
     with open(filename, 'r+') as file:
         # First we load existing data into a dictionary
@@ -180,8 +174,6 @@ def add_chat(account, username, init_vec, hashed_key, filename='data.json'):
 Deletes the chat between user1 and user2, if it exists
 
 """
-
-
 def remove_chat(user1, user2, filename = 'data.json'):
 
     js = json.load(open(filename))
@@ -210,21 +202,35 @@ def remove_chat(user1, user2, filename = 'data.json'):
 
 
 """
+Removes the user from the database and deletes all of his current chats
+
+"""
+def delete_user(user, user_database):
+    for other_user in user_database:
+        remove_chat(user, other_user)
+    remove_user(user)
+
+
+
+
+
+"""
 
 "messages": [
         {
             "user1": "admin",
             "user2": "admin2",
-            "init_vec": "iy23o8y4ow3iuho==",
             "hashed_key":"2972dhfioauhe3i2h=",
             "msg_data": [
                 {
                     "sent_by": "admin",
-                    "msg": "oiwuerioho8734yoig3287=="
+                    "msg": "oiwuerioho8734yoig3287==",
+                    "nonce": "ukyfu65ryvcg="
                 },
                 {
                     "sent_by": "admin2",
-                    "msg": "p9823y8og2o8t4=="
+                    "msg": "p9823y8og2o8t4==",
+                    "nonce": "lit7etrxtt87="
                 }
             ]
         }

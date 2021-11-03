@@ -27,10 +27,6 @@ account = []
 
 
 
-
-
-
-
 """
 _________________________________________________________________
 
@@ -268,6 +264,8 @@ Widgets(19,Message("username already taken",230,300,fs=10,wide=200))
 # back
 Widgets(2,Button("Back",530,10,wide=40,fs=8,com=[0,3]))
 
+
+
 """
 Page 3
 user input
@@ -401,7 +399,6 @@ def chat_load(data, mode, account=[]):
         password = data[1].get_val()
         password = sha256_hash(password.encode())
         hashed_pass = sha256_hash(password)
-        init_vec = b64decode(data[0][0]["init_vec"])
 
         if not hashed_pass == b64decode(data[0][0]["hashed_key"]):
             Widgets.seq([16,109])
@@ -413,7 +410,7 @@ def chat_load(data, mode, account=[]):
             for message in data[0][0]["msg_data"]:
                 #decrypt text
                 #hashed pass as key
-                text = aes_decrypt(password, b64decode(message["msg"]), init_vec)
+                text = aes_decrypt(password, b64decode(message["msg"]), b64decode(message["nonce"]))
                 text = str(message["sent_by"]) + ": " + text
                 
                 #display operations
@@ -455,7 +452,6 @@ Returns the contents of the send bar
 Only called after send is pressed
 Clears the content of the send bar
 """
-
 def get_message():
     global new_message
     temp = new_message.get_val()
@@ -492,7 +488,7 @@ Loads messages in the range: pages 110-129
 Assumes access has already been granted
 Assumes account already points to current chat (hence reload)
 """
-def reload_messages(account, password, init_vec):
+def reload_messages(account, password):
     global new_message
     for i in range(110,130):
         Widgets.rem_seq(i)
@@ -518,7 +514,7 @@ def reload_messages(account, password, init_vec):
 
     for message in msg_data:
         #decrypt text
-        text = aes_decrypt(password, b64decode(message["msg"]), init_vec)
+        text = aes_decrypt(password, b64decode(message["msg"]), b64decode(message["nonce"]))
         text = str(message["sent_by"]) + ": " + text
 
         #display operations

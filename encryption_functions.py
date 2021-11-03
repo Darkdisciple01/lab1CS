@@ -1,48 +1,52 @@
-from Crypto.Util.Padding import pad, unpad
 from Crypto import Random
 from Crypto.Cipher import AES
 from hashlib import sha256
 
-"""
-Encrypts data with AES cipher
-key must be 32 bytes
-returns cipher text and initialization vector
-"""
-def aes_encrypt(data, key, init_vec = Random.get_random_bytes(AES.block_size)):
-    # making sure key is proper length
-    key_size = 32  # 32 bytes = 256 bits
 
+"""
+Parameters: data to be encrypted and key to encrypt with
+key size is 32 bytes
+encrypts with AES CTR
+returns the encrypted text and nonce
+"""
+def aes_encrypt(data, key):
+    # making sure key is proper length
+    key_size = 32 # 32 bytes = 256 bits
     if len(key) != key_size:
         print("Improper key size: key size should be: " + str(key_size) + "\n\tkey size is: " + str(len(key)))
         exit(-1)
 
     data = data.encode('utf-8')
-    data = pad(data, AES.block_size)
-
-    # creating cipher
-
-    cipher = AES.new(key, AES.MODE_CBC, iv = init_vec) # cipher block chaining
+    cipher = AES.new(key, AES.MODE_CTR)
+    nonce = cipher.nonce
     cipher_text = cipher.encrypt(data)
 
-    return cipher_text, init_vec
+    print("key")
+    print(key)
+
+    print(cipher_text)
+
+    return cipher_text, nonce
+
+
 
 """
-Decrypts data with AES cipher 
-key should match encoded key for accurate decryption
-returns decoded message
+Parameters: key used for encryption, encrypted text, nonce used for encryption
+Decrypts text with AES CTR
+Returns data in string form
 """
-def aes_decrypt(key, cipher_text, init_vec):
-   
+def aes_decrypt(key, cipher_text, nonce):
+
     key_size = 32
-
     if len(key) != key_size:
         print("Improper key size: key size should be: " + str(key_size) + "\n\tkey size is: " + str(len(key)))
         exit(-1)
 
-    cipher = AES.new(key, AES.MODE_CBC, init_vec)
+    cipher = AES.new(key, AES.MODE_CTR, nonce=nonce)
     data = cipher.decrypt(cipher_text)
 
-    data = unpad(data, AES.block_size)
+    print(data)
+
     data = data.decode('utf-8')
 
     return data
@@ -86,10 +90,39 @@ password must be encoded
 returns bytes object
 """
 
-def sha256_hash(password):
+def sha256_hash(password, hexdigest = 0):
     h = sha256(password)
-    hb = h.digest()
+    if hexdigest == 0:
+        hb = h.digest()
+    else:
+        hb = h.hexdigest()
     return hb
+
+
+
+"""
+Returns the hexadecimal hash of a file
+input the file to be hashed
+"""
+
+def hash_file(file):
+
+    # buffer size for large files
+    BUF_SIZE = 65536
+
+    collective_data = sha256()
+
+    with open(file, 'rb') as f:
+        while True:
+            data = f.read(BUF_SIZE)
+
+            # True if eof = 1
+            if not data:
+                break
+
+            collective_data.update(data)
+
+    return collective_data.hexdigest()
 
 
 
