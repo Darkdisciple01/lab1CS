@@ -9,7 +9,7 @@ if corruption == 0:
     exit(0)
 
 
-user_database, pass_database = load_account_data()
+user_database, salt_database, pass_database = load_account_data()
 account = []
 message_data = load_message_data()
 
@@ -29,7 +29,7 @@ No returns
 
 
 def mainfunc(seq):
-    global userBox, passBox, user_database, pass_database, account, message_data
+    global userBox, passBox, user_database, pass_database, salt_database, account, message_data
     if seq == [1,88]:
 
         """
@@ -47,12 +47,13 @@ def mainfunc(seq):
         else:
             # Gets index of username, checks passwords
             index = user_database.index(username)
-            hashed_password = sha256_hash(password.encode())
-            if not hashed_password == pass_database[index]:
+            passkey, s = scrypt_pass(password, salt_database[index])
+
+            if not passkey == pass_database[index]:
                 Widgets.seq([0,3,16])
             else:
                 # hashed passwords match, load account
-                account = [user_database[index], pass_database[index],{}]
+                account = [user_database[index], pass_database[index], {},0]
                 # Loads the user's chats
                 chat_load(message_data, 2, account)
     
@@ -76,11 +77,10 @@ def mainfunc(seq):
             if username in user_database:
                 Widgets.seq([2,3,19])
             else:
-                password = password.encode()
-                hashed_password = sha256_hash(password)
-
-                add_user(username, hashed_password)
-                user_database, pass_database = load_account_data()
+                passkey, salt = scrypt_pass(password)
+                
+                add_user(username, salt, passkey)
+                user_database, salt_database, pass_database = load_account_data()
 
                 print("account created: " + str(username))
         elif empty:
@@ -94,33 +94,17 @@ def mainfunc(seq):
         """
         On pressing |send| to send a message
         Parameters: user-entered password, message in message box
-        Checks validity of password, adds message to current chat
+        adds message to current chat
         """
+        passkey = account[3]
 
-        password = get_password() # returns password, clears password field box
+        message = get_message()
 
-        if password == "":
-            Widgets.seq(4) # ask for password
-        else:
-            hashed_password = sha256_hash(password.encode())
-            doubly_hashed_password = sha256_hash(hashed_password)
-
-            compare_hash = b64decode(account[2]["hashed_key"]) # account[2] stores current chat
-
-            # ensures password is correct
-            if not doubly_hashed_password == compare_hash:
-                Widgets.seq([4,16])
-
-            # if password is correct, encrypts message and adds message into the chat
-            else:
-                message = get_message()
-                hashed_password = sha256_hash(password.encode())
-
-                enc_message, nonce = aes_encrypt(message, hashed_password)
-                add_message(enc_message, account, nonce) # account includes information on the chat
+        enc_message, nonce = aes_encrypt(message, passkey)
+        add_message(enc_message, account, nonce) # account includes information on the chat
                 
-                message_data = load_message_data()
-                reload_messages(account, hashed_password)
+        message_data = load_message_data()
+        reload_messages(account, passkey)
 
 
 
@@ -154,8 +138,10 @@ def mainfunc(seq):
                         Widgets.seq([5,21])
                 
                 if flag == 0:
-                    doubly_hashed_password = sha256_hash(sha256_hash(password.encode()))
-                    add_chat(account, username, doubly_hashed_password)
+                    # uses scrypt - can specify generation time
+                    key, salt = scrypt_pass(password)
+                    hashed_password = sha256_hash(key)
+                    add_chat(account, username, salt, hashed_password)
                     # reload chats
                     message_data = load_message_data()
                     chat_load(message_data, 2, account)
@@ -190,7 +176,9 @@ if x == 0:
 
 if x == 1:
     root.withdraw()
-    remove_chat("a","j") 
+    delete_user("a") 
+    
+
 
 add_backup()
 

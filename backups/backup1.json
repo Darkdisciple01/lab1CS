@@ -1,13 +1,77 @@
 {
     "users": [
         {
-            "username": "j",
-            "password": "GJ9AA0vnoZnx+piRZo7jq2BJ+C04xovnD1luqy4YV7c="
+            "username": "a",
+            "salt": "jN4n0jBsSw+mhu9cZCvbew==",
+            "password": "Uy/RbvqeaCRc+ZlrAaTT+3Lj/lVlW4fKqmHNL4xM/6g="
         },
         {
-            "username": "a",
-            "password": "ypeBEsobvcr6wjGzmiPcTaeG7/gUfE5yuYB3ha/uSLs="
+            "username": "jon",
+            "salt": "BkH+2BuC0abPSfH6yAhDrQ==",
+            "password": "AWbJoHRblW46KracDZYITm7LjrAgH/L5+Q51+UiqJaY="
+        },
+        {
+            "username": "b",
+            "salt": "BkH+2BuC0abPSfH6yAhDrQ==",
+            "password": "mH+SrsLet021OY16QEH1zrYQXAOQtUZd5iz6moi1pdM="
         }
     ],
-    "messages": []
+    "messages": [
+        {
+            "user1": "jon",
+            "user2": "a",
+            "salt": "BkH+2BuC0abPSfH6yAhDrQ==",
+            "hashed_key": "f05stjYm60ukgseNRUqqg0niP4SkJfixzNzBZn37z5o=",
+            "msg_data": [
+                {
+                    "sent_by": "jon",
+                    "msg": "5yxPOcIEL3VnCEUH7bsrq0i9",
+                    "nonce": "oMS37tZeR9o="
+                },
+                {
+                    "sent_by": "jon",
+                    "msg": "muzQqs3yGbDzAtLSbhfXSU9lfQX0fWrGtGE=",
+                    "nonce": "ImZ+bhKXA28="
+                },
+                {
+                    "sent_by": "jon",
+                    "msg": "di5D+0/LinrIZzH/5cx8+RH4jUYhIBubq/wx",
+                    "nonce": "oj5JK6pkkWQ="
+                },
+                {
+                    "sent_by": "a",
+                    "msg": "BtQfU2LGsTsM7jdQosTf/cCci+pUn4Sg4r+VEArRwD8mUHOA",
+                    "nonce": "PAh7pLelvZY="
+                },
+                {
+                    "sent_by": "a",
+                    "msg": "ScJ6vo55PgRJwgECSMexeNnQVw1OmyokGKkHZZGOsKH9TrObEaqrRLbBwBPr",
+                    "nonce": "tIwZbN1oXno="
+                },
+                {
+                    "sent_by": "a",
+                    "msg": "P3aEr+680EZaJgnE+u1/ZAcbYw==",
+                    "nonce": "Q7Fzd5ujris="
+                }
+            ]
+        },
+        {
+            "user1": "a",
+            "user2": "b",
+            "salt": "BkH+2BuC0abPSfH6yAhDrQ==",
+            "hashed_key": "f05stjYm60ukgseNRUqqg0niP4SkJfixzNzBZn37z5o=",
+            "msg_data": [
+                {
+                    "sent_by": "a",
+                    "msg": "9bb8GUjrW0q1tsKX8d0RzYXGDiBo",
+                    "nonce": "h//i9YzGCkE="
+                },
+                {
+                    "sent_by": "a",
+                    "msg": "C0PRAT9WnTfpdE7yvJ03L5bXoJsD",
+                    "nonce": "HmJfC5eFJus="
+                }
+            ]
+        }
+    ]
 }

@@ -36,4 +36,17 @@
 
 [ ] AES CTR
      - USE NONCE LOCALLY TO THE MESSAGE - DONT REPEAT NONCE/KEY PAIR
-     - THEN PUSH!!!!
+     - THEN PUSH!!!
+
+
+
+
+
+Questions: 
+ - Should we use counters for CTR
+ - Should we introduce an authority for key exchange
+   - if so how would that work
+ - do we need to use HMAC instead of SHA256
+
+
+!

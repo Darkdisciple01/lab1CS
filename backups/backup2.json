@@ -1,12 +1,9 @@
 {
     "users": [
         {
-            "username": "j",
-            "password": "GJ9AA0vnoZnx+piRZo7jq2BJ+C04xovnD1luqy4YV7c="
-        },
-        {
             "username": "a",
-            "password": "ypeBEsobvcr6wjGzmiPcTaeG7/gUfE5yuYB3ha/uSLs="
+            "salt": "jN4n0jBsSw+mhu9cZCvbew==",
+            "password": "Uy/RbvqeaCRc+ZlrAaTT+3Lj/lVlW4fKqmHNL4xM/6g="
         }
     ],
     "messages": []

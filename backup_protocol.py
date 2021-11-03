@@ -53,7 +53,7 @@ def check_corruption(filename = "data.json", index = "hash1", root = 0):
     backuphash = json.load(open(backuphashes_path, "r"))[index]
 
     if filename == "data.json" and not hash1 == backuphash:
-        print("\nData does not match last backup")
+        print("Data does not match last backup")
         print("This may be caused by program interruption or data corruption")
         print("Checking backup validity")
         

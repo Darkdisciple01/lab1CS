@@ -1,5 +1,6 @@
 from Crypto import Random
 from Crypto.Cipher import AES
+from Crypto.Protocol.KDF import scrypt
 from hashlib import sha256
 
 
@@ -21,11 +22,6 @@ def aes_encrypt(data, key):
     nonce = cipher.nonce
     cipher_text = cipher.encrypt(data)
 
-    print("key")
-    print(key)
-
-    print(cipher_text)
-
     return cipher_text, nonce
 
 
@@ -44,45 +40,10 @@ def aes_decrypt(key, cipher_text, nonce):
 
     cipher = AES.new(key, AES.MODE_CTR, nonce=nonce)
     data = cipher.decrypt(cipher_text)
-
-    print(data)
-
     data = data.decode('utf-8')
 
     return data
 
-
-
-from cryptography.fernet import Fernet
-
-"""
-Encrypts file with key.key
-"""
-def encrypt_file(filename='data.json'):
-    key = open("key.key", "rb").read()
-    f = Fernet(key)
-    with open(filename, "rb") as file:
-        # read all file data
-        file_data = file.read()
-    encrypted_data = f.encrypt(file_data)
-    with open(filename, "wb") as file:
-        file.write(encrypted_data)
-
-
-"""
-Decrypts file with key.key
-"""
-def decrypt_file(filename='data.json'):
-    key = open("key.key", "rb").read()
-    f = Fernet(key)
-    with open(filename, "rb") as file:
-        # read the encrypted data
-        encrypted_data = file.read()
-    # decrypt data
-    decrypted_data = f.decrypt(encrypted_data)
-    # write the original file
-    with open(filename, "wb") as file:
-        file.write(decrypted_data)
 
 """
 Creates sha256 hash of string
@@ -123,6 +84,19 @@ def hash_file(file):
             collective_data.update(data)
 
     return collective_data.hexdigest()
+
+
+
+
+"""
+Generates key and salt from a password
+Uses scrypt; N specifies time of operation (2^14 = 100ms, 2^20 = 5s)
+Returns key (bytes) and salt (bytes)
+"""
+def scrypt_pass(password, salt=Random.get_random_bytes(16)):
+    key = scrypt(password.encode(), salt, 32, N=2**14, r=8, p=1)
+    return key, salt
+
 
 
 

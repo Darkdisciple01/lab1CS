@@ -165,7 +165,7 @@ Page designation:
 1           message board helper widgets
 2           create user
 3           username and password input
-4           re-enter password
+4           re-enter password REMOVEDFROMFEATURES
 5           enter username
 6-14        *unused* designated for page operations
 15-16       login errors
@@ -397,13 +397,16 @@ def chat_load(data, mode, account=[]):
         line = 50
         start = 1
         password = data[1].get_val()
-        password = sha256_hash(password.encode())
+        salt = b64decode(data[0][0]["salt"])
+        password, s = scrypt_pass(password, salt)
         hashed_pass = sha256_hash(password)
 
         if not hashed_pass == b64decode(data[0][0]["hashed_key"]):
             Widgets.seq([16,109])
         else:
+            # stores chat and gives access to account, stores password in RAM
             data[0][1][2] = data[0][0]
+            data[0][1][3] = password
 
             Widgets(110,Button("^",x=550,y=40,wide=70,com=[110]))
 

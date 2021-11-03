@@ -31,22 +31,15 @@ Adds user with username, password to 'data.json'
 Password and key will be base64 encoded before insertion
 Password must be hashed before called as argument
 """
-def add_user(username, password, filename='data.json'):
+def add_user(username, salt, password, filename='data.json'):
 
-    # Searching for coincidences
     js  = json.load(open(filename))
-
-    for user in js["users"]:
-        if user["username"] == str(username):
-            raise TypeError(str(username) + " is already used as a name account")
-            break
-
     # Creating the dictionary
-
+    
+    salt_b64 = b64encode(salt).decode('utf-8')
     password_b64 = b64encode(password).decode('utf-8')
 
-    new_data = {"username": str(username), 
-            "password": (password_b64)}
+    new_data = {"username": str(username), "salt": salt_b64, "password": password_b64}
 
     with open(filename, 'r+') as file:
         # First we load existing data into a dictionary
@@ -92,13 +85,15 @@ def load_account_data():
     data = read_file()
 
     user_database = []
+    salt_database = []
     pass_database = []
 
     for account in data["users"]:
         user_database.append(account["username"])
+        salt_database.append(b64decode(account["salt"].encode('utf-8')))
         pass_database.append(b64decode(account["password"].encode('utf-8')))
 
-    return user_database, pass_database
+    return user_database, salt_database, pass_database
 
 
 
@@ -150,13 +145,14 @@ def add_message(message, account, nonce, filename='data.json'):
 creates a new chat with given specifications
 key must already be hashed
 """
-def add_chat(account, username, hashed_key, filename='data.json'):
+def add_chat(account, username, salt, hashed_key, filename='data.json'):
 
     js = json.load(open(filename))
 
+    b64salt = b64encode(salt).decode()
     b64hashed_key = b64encode(hashed_key).decode()
 
-    new_data = {"user1": account[0], "user2": username, "hashed_key": b64hashed_key, "msg_data":[]}
+    new_data = {"user1": account[0], "user2": username, "salt": b64salt, "hashed_key": b64hashed_key, "msg_data":[]}
 
     with open(filename, 'r+') as file:
         # First we load existing data into a dictionary
@@ -220,6 +216,7 @@ def delete_user(user, user_database):
         {
             "user1": "admin",
             "user2": "admin2",
+            "salt": "16byteso823y4o92hgog23"
             "hashed_key":"2972dhfioauhe3i2h=",
             "msg_data": [
                 {
