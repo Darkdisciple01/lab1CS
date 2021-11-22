@@ -32,7 +32,7 @@ Decrypts text with AES CTR
 Returns data in string form
 """
 def aes_decrypt(key, cipher_text, nonce):
-
+    # making sure key is proper length
     key_size = 32
     if len(key) != key_size:
         print("Improper key size: key size should be: " + str(key_size) + "\n\tkey size is: " + str(len(key)))
@@ -50,7 +50,6 @@ Creates sha256 hash of string
 password must be encoded
 returns bytes object
 """
-
 def sha256_hash(password, hexdigest = 0):
     h = sha256(password)
     if hexdigest == 0:
@@ -65,9 +64,7 @@ def sha256_hash(password, hexdigest = 0):
 Returns the hexadecimal hash of a file
 input the file to be hashed
 """
-
 def hash_file(file):
-
     # buffer size for large files
     BUF_SIZE = 65536
 
@@ -84,7 +81,6 @@ def hash_file(file):
             collective_data.update(data)
 
     return collective_data.hexdigest()
-
 
 
 

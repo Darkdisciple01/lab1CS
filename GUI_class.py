@@ -326,12 +326,7 @@ Widgets(5,Button("Continue",x=235,y=320,wide=100,com=[88,90]))
 # back
 Widgets(5,Button("Back",530,10,wide=40,fs=8,com=[1,100]))
 
-# error for starting chat with self
-Widgets(20,Message("cannot start chat with self",x=200,y=250,fs=10,wide=200))
-
-# error for chat already exists
-Widgets(21,Message("chat already exists",x=200,y=250,fs=10,wide=200))
-
+# error for starting cha
 
 
 """

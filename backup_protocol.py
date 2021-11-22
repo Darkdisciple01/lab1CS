@@ -3,6 +3,7 @@ import json
 import tkinter as tk
 
 """
+Trusted Boot Routine
 Adds a backup of the current data.json file (or specified) into the backups folder
 backup is added into the file "backup1", and contents of "backup1" are pushed to "backup2"
 Only 2 backup files and their hashes are stored

@@ -31,6 +31,7 @@
 
 [ ] remove need for passwords to the chat (digital signatures)
      - figure out how to generate the encryption key in Gamal (each time)
+     - encrypted keys are stored
 
 [X] AES CTR
 
@@ -40,13 +41,20 @@
 
 
 
+In essay revise: 
+ - reasoning for AES key length
+ - state attacker model you have in mind
+ - justify authentication
 
+salts not unique, need to fix?
+
+how data organized in real life, separate into directories and
+packages??
 
 Questions: 
- - Should we use counters for CTR
- - Should we introduce an authority for key exchange
-   - if so how would that work
- - do we need to use HMAC instead of SHA256 for backups
+ - Should we use initial value for CTR counter
+ - How does key exchange authority work
+
 
 
 
