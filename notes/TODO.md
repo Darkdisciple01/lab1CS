@@ -58,3 +58,25 @@ Questions:
 
 
 
+MAJOR FIXES
+ - global variables in mainfunc
+ - restructure chat load
+ - fix 3 functions in lab GUI
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
