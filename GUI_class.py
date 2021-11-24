@@ -1,7 +1,10 @@
 import tkinter as tk
 import tkinter.font as tkFont
 import messager
-
+from Data_class import *
+import file_operations as fop
+import encryption_functions as ef
+import cert_auth.certificate_authority as CA
 
 """
 The Widgets class organizes and calls on "events" or different pages. The home page is denoted as page 0. 
@@ -102,7 +105,7 @@ class Button(Widget):
         if msgload == 0:
             btn = tk.Button(frame, text=text,bg="gray",fg=Widget.defaultFontColor,command= lambda: Widgets.seq(com))
         else:
-            btn = tk.Button(frame, text=text,bg="gray",fg=Widget.defaultFontColor,command= lambda: chat_load(com, msgload-1))
+            btn = tk.Button(frame, text=text,bg="gray",fg=Widget.defaultFontColor,command= com)
         btn.configure(font=("Roboto "+str(fs)))
         super().__init__(btn, frame, x, y)
 
@@ -151,122 +154,48 @@ class Text(Widget):
 
 """
 Loads chats and displays them on the screen
-Upon selecting a chat, prompts for a password
-If password is correct, displays all messages corresponding to the chat
-
+Upon selection of a chat, loads messages
 no returns
-after login, chat_load(data.json["messages"], 2, [user, pass, {}]) is called
-after correct password is entered function updates account to: 
-                                [user, pass, data.json["messages"][i]["msg_chat"]
 """
 
-def chat_load(data, mode, account=[]):
-    global new_message
-    # mode 2 is loading all the chats on Widgets seq 100-108, data = json["messages"]
-    if mode == 2:
-        user = account[0] 
-        for i in range(100,109):
-            Widgets.rem_seq(i)
+def chat_load():
+    # loading all the chats on Widgets seq 100-108, data = json["messages"]
+    username = Data.t_username
+    data = fop.load_message_data()
 
-        page = 100
-        Widgets.add(100,Button("^",x=550,y=40,wide=70,com=[1,100]))
+    for i in range(100,109):
+        Widgets.rem_seq(i)
 
-        new_button = ""
-        i = 0
-        for chat in data:
-            if user == chat["user1"] or user == chat["user2"]:
-                name = chat["user1"] if not chat["user1"] == user else chat["user2"]
-                new_button = Button(name,x=40,y=75+65*(int(i)%5),wide=200,msgload=2,com=[chat,account,name])
-                new_button.configure(wide=35,high=1)
-                Widgets.add(int(100+i/5),new_button)
-                i+=1
-                if not page == int(100+i/5):
-                    page += 1
-                    Widgets.rem_seq(page)
-                    Widgets.add(page-1,Button("v",x=550,y=350,wide=70,com=[1,page]))
-                    Widgets.add(page,Button("^",x=550,y=40,wide=70,com=[1,page-1]))
+    page = 100
+    Widgets.add(100,Button("^",x=550,y=40,wide=70,com=[1,100]))
 
-                if i >= 45:
-                    print("Please expand chat database")
-                    exit(-3)
+    new_button = ""
+    i = 0
+    for chat in data:
+        if username == chat["user1"] or username == chat["user2"]:
+            name = chat["user1"] if not chat["user1"] == username else chat["user2"]
+            new_button = Button(name,x=40,y=75+65*(int(i)%5),wide=200,msgload=1,com= lambda chat=chat: msg_load(chat))
+            new_button.configure(wide=35,high=1)
+            Widgets.add(int(100+i/5),new_button)
+            i+=1
+            if not page == int(100+i/5):
+                page += 1
+                Widgets.rem_seq(page)
+                Widgets.add(page-1,Button("v",x=550,y=350,wide=70,com=[1,page]))
+                Widgets.add(page,Button("^",x=550,y=40,wide=70,com=[1,page-1]))
+            if i >= 45:
+                print("Please expand chat database")
+                exit(-3)
 
-        Widgets.add(page,Button("v",x=550,y=350,wide=70,com=[1,page]))
+    Widgets.add(page,Button("v",x=550,y=350,wide=70,com=[1,page]))
 
-        if i == 0:
-            Widgets.add(100,Message("Sorry, you have no chats at this time",halfx-110,175,wide=200,fs=18))
+    if i == 0:
+        Widgets.add(100,Message("Sorry, you have no chats at this time",190,175,wide=200,fs=18))
 
-        Widgets.seq([100,1])
+    Widgets.seq([100,1])
 
-    # mode 1 is getting password, data = [chat,account,name], seq 109
-    elif mode == 1:
-        # get the password
-        passkeyBox = Input_Box(x=205,y=200,wide=100,hidden=1)
-        Widgets.add(109,Message("Please enter the password for this chat",halfx-125,50,wide=250,fs=18))
-        Widgets.add(109,passkeyBox)
-        Widgets.add(109,Button("Continue",x=235,y=320,wide=100,msgload=1,com=[data, passkeyBox]))
-        Widgets.add(109,Button("Back",530,10,wide=40,fs=8,com=[100,1]))
 
-        Widgets.seq(109)
 
-    # mode 0 loads all chats and begins display from end, seq 110-129, data=[[chat,account,name],passkeyBox]
-    elif mode == 0:
-        for i in range(110,130):
-            Widgets.rem_seq(i)
-        page = 110
-        line = 50
-        start = 1
-        password = data[1].get_val()
-        salt = b64decode(data[0][0]["salt"])
-        password, s = scrypt_pass(password, salt)
-        hashed_pass = sha256_hash(password)
-
-        if not hashed_pass == b64decode(data[0][0]["hashed_key"]):
-            Widgets.seq([16,109])
-        else:
-            # stores chat and gives access to account, stores password in RAM
-            data[0][1][2] = data[0][0]
-            data[0][1][3] = password
-
-            Widgets.add(110,Button("^",x=550,y=40,wide=70,com=[110]))
-
-            for message in data[0][0]["msg_data"]:
-                #decrypt text
-                #hashed pass as key
-                text = aes_decrypt(password, b64decode(message["msg"]), b64decode(message["nonce"]))
-                text = str(message["sent_by"]) + ": " + text
-                
-                #display operations
-                lines = Text.get_lines(text)
-                line_end = ((lines-1)*17 + 20 + line)
-                if line_end > 310:
-                    Widgets.add(page,Button("v",x=550,y=350,wide=70,com=[page+1]))
-                    line = 50
-                    page += 1
-                    Widgets.add(page,Button("^",x=550,y=40,wide=70,com=[page-1]))
-                    if page > 129:
-                        print("Please expand message database")
-                        exit(-3)
-                else:
-                    if start == 1:
-                        start = 0
-                    else:
-                        line += 20
-
-                Widgets.add(page,Text(text,10,line,wide=55,fs=12,highl=lines))
-                line += (lines-1)*17
-
-            Widgets.add(page,Button("v",x=550,y=350,wide=70,com=[page]))
-
-            name = data[0][2]    
-            name_string = "Chat with " + name
-
-            for j in range(110, page+1):
-                Widgets.add(j,Button("Back",540,10,wide=40,fs=8,com=[88,91]))
-                Widgets.add(j,Message(name_string, halfx-90, 10, fs=20))
-                Widgets.add(j,new_message)
-                Widgets.add(j,Button("Send",460,350,wide=40,fs=8,com=[88,89]))
-
-            Widgets.seq([page])
 
 
 
@@ -275,33 +204,33 @@ Reloads messages in the range: pages 110-129
 Assumes access has already been granted
 Assumes account already points to current chat (hence reload)
 """
-def reload_messages(account, password):
-    global new_message
+def msg_load(chat):
+    new_message = Data.get_boxes2()
+    Data.load_chat_data(chat)
+
+    # calc key with Diffie Hellman
+    a = int(CA.pem_to_hex(Data.t_priv, 128), 0)
+    Y_other = fop.get_Y(Data.c_other)
+    shared_key = ef.generate_Y(a, Y_other)
+
+    #How to turn shared_key (int) into shared bytes
+    salt = Data.c_salt
+    key, s = ef.scrypt_pass(str(shared_key), salt)
+    Data.load_chat_key(key)
+
     for i in range(110,130):
         Widgets.rem_seq(i)
     page = 110
     line = 50
     start = 1
-
-    Widgets.add(110,Button("^",x=550,y=40,wide=70,com=[110]))
-
-    js = json.load(open('data.json'))
- 
     index = -1
 
-    for i in range(len(js["messages"])):
-        if js["messages"][i]["user1"] == account[2]["user1"] and js["messages"][i]["user2"] == account[2]["user2"]:
-            index = i
+    Widgets.add(110,Button("^",x=550,y=40,wide=70,com=[110]))
+    js = fop.json.load(open('data.json'))
 
-    if index == -1:
-        print("MAJOR LOGICAL ERROR IN RELOAD MESSAGES/ACCOUNT")
-        exit(-5)
-    
-    msg_data = js["messages"][index]["msg_data"]
-
-    for message in msg_data:
+    for message in chat["msg_data"]:
         #decrypt text
-        text = aes_decrypt(password, b64decode(message["msg"]), b64decode(message["nonce"]))
+        text = ef.aes_decrypt(key, b64decode(message["msg"]), b64decode(message["nonce"]))
         text = str(message["sent_by"]) + ": " + text
 
         #display operations
@@ -327,17 +256,16 @@ def reload_messages(account, password):
 
     Widgets.add(page,Button("v",x=550,y=350,wide=70,com=[page]))
 
-    user = account[0]
-    name = js["messages"][index]["user1"] if not js["messages"][index]["user1"] == user else js["messages"][index]["user2"]
-
-    name_string = "Chat with " + name
+    # chat interface generation
+    name_string = "Chat with " + Data.c_other
 
     for j in range(110, page+1):
         Widgets.add(j,Button("Back",540,10,wide=40,fs=8,com=[88,91]))
-        Widgets.add(j,Message(name_string, halfx-90, 10, fs=20))
+        Widgets.add(j,Message(name_string, 210, 10, fs=20))
         Widgets.add(j,new_message)
         Widgets.add(j,Button("Send",460,350,wide=40,fs=8,com=[88,89]))
 
+    # open chat on last page of text
     Widgets.seq([page])
 
 

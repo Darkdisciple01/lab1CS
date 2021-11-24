@@ -1,7 +1,7 @@
 from lab_GUI import *
 from file_operations import *
 from encryption_functions import *
-from backup_protocol import *
+import cert_auth.certificate_authority as CA
 
 
 """
@@ -19,7 +19,7 @@ No returns
 
 
 def mainfunc(seq):
-    global userBox, passBox, user_database, pass_database, salt_database, account, message_data
+    global account, message_data
     if seq == [1,88]:
 
         """
@@ -29,23 +29,43 @@ def mainfunc(seq):
           the relevant error message
         """
 
+        userBox, passBox, confirm_passBox = Data.get_boxes1()
+        user_database, pass_database, salt_database = Data.get_databases()
+
         username = userBox.get_val()
         password = passBox.get_val()
 
         if username not in user_database:
+            # incorrect username
             Widgets.seq([0,3,15])
         else:
             # Gets index of username, checks passwords
             index = user_database.index(username)
             passkey, s = scrypt_pass(password, salt_database[index])
+            hashed_passkey = sha256_hash(passkey)
 
-            if not passkey == pass_database[index]:
+            if not hashed_passkey == pass_database[index]:
+                # incorrect password
                 Widgets.seq([0,3,16])
             else:
-                # hashed passwords match, load account
-                account = [user_database[index], pass_database[index], {},0]
-                # Loads the user's chats
-                chat_load(message_data, 2, account)
+                # verifying account with signature
+                data = read_file()
+                account = data["users"][index]
+                material = json.dumps(account[0]).encode()
+                signature = b64decode(account[1]["signature"].encode())
+                if CA.verify(material, signature):
+                    # hashed passwords match, account is verified, load account
+                    # calculate the private key
+                    enc_priv = b64decode(account[0]["enc_priv"].encode())
+                    nonce = b64decode(account[0]["nonce"].encode())
+                    priv = aes_decrypt(passkey, enc_priv, nonce)
+                    # load into Data class
+                    Data.login(account, priv)
+                    # Loads the user's chats
+                    chat_load()
+                else:
+                    # verification error
+                    Widgets.seq([0,3,22])
     
 
     if seq == [0,3,88]:
@@ -57,25 +77,39 @@ def mainfunc(seq):
           error handling
         """
 
+        userBox, passBox, confirm_passBox = Data.get_boxes1()
+        user_database = Data.get_databases()[0]
+
         username = userBox.get_val()
         password = passBox.get_val()
         confirm = confirm_passBox.get_val()
 
         empty = bool(password == "" or username == "")
 
+        # if passwords match and are something
         if(password == confirm and not empty):
             if username in user_database:
+                # error for matching usernames
                 Widgets.seq([2,3,19])
             else:
+                # create new account
                 passkey, salt = scrypt_pass(password)
-                
-                add_user(username, salt, passkey)
-                user_database, salt_database, pass_database = load_account_data()
+                priv, pub = CA.generate_key_pair()
+                enc_priv, nonce = aes_encrypt(priv.decode('utf-8'), passkey)
+                priv_int = int(CA.pem_to_hex(priv, 128), 0)
+                Y = generate_Y(priv_int)
+                Y_signed = CA.sign(str(Y).encode(), priv)
+                enc_priv, nonce = aes_encrypt(priv.decode('utf-8'), passkey)
+                hashed_passkey = sha256_hash(passkey)
+               
+                add_user(username, salt, hashed_passkey, pub, enc_priv, nonce, Y, Y_signed)
+                load_account_data()
 
-                print("account created: " + str(username))
         elif empty:
+            # one of the fields is empty
             Widgets.seq([2,3,18])
         else:
+            # passwords don't match
             Widgets.seq([2,3,17])
 
 
@@ -86,15 +120,19 @@ def mainfunc(seq):
         Parameters: user-entered password, message in message box
         adds message to current chat
         """
-        passkey = account[3]
+        key = Data.get_chatdata()[2]
 
         message = get_message()
 
-        enc_message, nonce = aes_encrypt(message, passkey)
-        add_message(enc_message, account, nonce) # account includes information on the chat
+        enc_message, nonce = aes_encrypt(message, key)
+        add_message(enc_message, nonce) # account includes information on the chat
                 
-        message_data = load_message_data()
-        reload_messages(account, passkey)
+        chat = get_chat(Data.t_username, Data.c_other)
+        if chat == -1:
+            print("MAJOR LOGICAL ERROR IN load_chat")
+            exit(-6)
+        
+        msg_load(chat)
 
 
 
@@ -107,35 +145,29 @@ def mainfunc(seq):
           is created from input specified password.
         """
 
-        username, password = get_username()
+        username = get_username()
+        user_database = Data.get_databases()[0]
 
-        if username == "" or password == "":
+        if username == "":
             Widgets.seq(5)
         else:
             if not username in user_database:
                 Widgets.seq([5,15])
-            elif username == account[0]:
+            elif username == Data.t_username:
                 Widgets.seq([5,20])
             else:
                 # check if chat already exists
-                flag = 0
-                for chat in message_data:
-                    if chat["user1"] == account[0] and chat["user2"] == username:
-                        flag = 1
-                        Widgets.seq([5,21])
-                    if chat["user2"] == account[0] and chat["user1"] == username:
-                        flag = 1
-                        Widgets.seq([5,21])
-                
-                if flag == 0:
-                    # uses scrypt - can specify generation time
-                    key, salt = scrypt_pass(password)
-                    hashed_password = sha256_hash(key)
-                    add_chat(account, username, salt, hashed_password)
+                flag = get_chat(username, Data.t_username)
+                if flag == -1:
+                    x, salt = scrypt_pass("b")
+                    add_chat(username, salt)
                     # reload chats
-                    message_data = load_message_data()
-                    chat_load(message_data, 2, account)
-    
+                    chat_load()
+                    msg_load(get_chat(username, Data.t_username))
+                else:
+                    Widgets.seq([5,21])
+
+
     if seq == [88,91]:
 
         """
@@ -145,9 +177,18 @@ def mainfunc(seq):
           data staying within the data of the chat button
         """
 
-        chat_load(load_message_data(), 2, account)
+        chat_load()
 
-
+    
+    if seq == [88,92]:
+        
+        """
+        On pressing Logout to log out
+        clears Data class and brings user to login page
+        """
+        
+        Data.session_clear()
+        Widgets.seq([0,3])
 
 
 

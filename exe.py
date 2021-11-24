@@ -1,23 +1,23 @@
 from messager import *
-
+import backups.backup_protocol as bp
 
 """
 Loading the GUI class and interface
 """
 root = tk.Tk()
 Widgets(root)
+Data.root = root
 init_msgGUI()
 
 
 """
-Checking for corruption, loading variables
+Checking for corruption, loading variables into data class
 """
-corruption = check_corruption(root = Widgets.root)
+corruption = bp.check_corruption()
 if corruption == 0:
     exit(0)
 
-user_database, salt_database, pass_database = load_account_data()
-account = []
+load_account_data()
 message_data = load_message_data()
 
 
@@ -26,23 +26,20 @@ Different operation modes
 0,NULL for GUI, 1 for Testing
 """
 
-
 import sys
 x = (int)(sys.argv[1]) if (len(sys.argv)>1) else 0
 
 if x == 0:
-    print("Booting GUI")
     # initiation
     Widgets.seq([0, 3])
     root.mainloop()
 
 if x == 1:
+    # testing
     root.withdraw()
 
 
-
-
-add_backup()
+bp.add_backup()
 
 
 

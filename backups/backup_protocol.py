@@ -1,6 +1,7 @@
 from encryption_functions import hash_file
 import json
 import tkinter as tk
+from Data_class import *
 
 """
 Trusted Boot Routine
@@ -44,7 +45,7 @@ If it finds a corruption, reverts to last uncorrupted backup
 If no uncorrupted backup, prompts user to wipe database
 unfinished - write load backup 1 and load backup 2
 """
-def check_corruption(filename = "data.json", index = "hash1", root = 0):
+def check_corruption(filename = "data.json", index = "hash1"):
 
     flag = 0
     backuphashes_path = "backups/backuphashes.json"
@@ -58,7 +59,7 @@ def check_corruption(filename = "data.json", index = "hash1", root = 0):
         print("This may be caused by program interruption or data corruption")
         print("Checking backup validity")
         
-        if check_corruption("backups/backup1.json", "hash1", root) == 1:
+        if check_corruption("backups/backup1.json", "hash1") == 1:
             # continue with loading backup1
             f = open("data.json", "w")
             f.write(open("backups/backup1.json", "r+").read())
@@ -72,7 +73,7 @@ def check_corruption(filename = "data.json", index = "hash1", root = 0):
 
     if filename == "backups/backup1.json" and not hash1 == backuphash:
         print("\nBackup file 1 corrupted, checking file 2")
-        if check_corruption("backups/backup2.json", "hash2", root) == 1:
+        if check_corruption("backups/backup2.json", "hash2") == 1:
             # continue with loading backup2
             f = open("data.json", "w")
             f.write(open("backups/backup2.json", "r+").read())
@@ -86,7 +87,7 @@ def check_corruption(filename = "data.json", index = "hash1", root = 0):
         return 1
 
     if filename == "backups/backup2.json" and not hash1 == backuphash:
-        root.withdraw()
+        Data.root.withdraw()
         print("\nBackup file 2 corrupted, requesting permission to wipe system data")
         input("Enter any key to continue...")
         input("Are you sure? This will delete all existing users and chats")

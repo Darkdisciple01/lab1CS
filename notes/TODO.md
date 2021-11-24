@@ -29,15 +29,15 @@
 
 [X] ensure data integrity
 
-[ ] remove need for passwords to the chat (digital signatures)
+[X] remove need for passwords to the chat (digital signatures)
      - figure out how to generate the encryption key in Gamal (each time)
      - encrypted keys are stored
 
 [X] AES CTR
 
-[ ] If decide to use authority, put files into folder, separate GUI class and implementation?
+[X] If decide to use authority, put files into folder, separate GUI class and implementation?
 
-[ ] Packages?
+[ ] Packages? Note circularity between GUI_class and messager
 
 
 
@@ -46,29 +46,12 @@ In essay revise:
  - state attacker model you have in mind
  - justify authentication
 
-salts not unique, need to fix?
 
 how data organized in real life, separate into directories and
 packages??
 
-Questions: 
- - Should we use initial value for CTR counter
- - How does key exchange authority work
-
-
-
-
-MAJOR FIXES
- - global variables in mainfunc
- - restructure chat load
- - fix 3 functions in lab GUI
-
-
-
-
-
-
-
+- change import****** to as
+- delete chat, delete account
 
 
 
