@@ -37,7 +37,7 @@ Uses 2048 bit RSA with e=65537, FIPS standard
 returns private, public key
 """
 def generate_key_pair():
-    priv = RSA.generate(2048)
+    priv = RSA.generate(4096)
     pub = priv.publickey()
     priv = priv.exportKey()
     pub = pub.exportKey()
@@ -62,6 +62,21 @@ def pem_to_hex(key, num_values = -1):
         hexy = hexy[:num_values+2]
         hexy = hex(int(hexy, 16))
     return hexy
-    
+   
+
+
+"""
+GENERATE NEW PUBLIC/PRIVATE KEY PAIR
+
+priv, pub = generate_key_pair()
+with open("./cert_auth/priv_key.pem", "w") as f:
+    f.write(priv.decode())
+    f.close()
+
+with open("./cert_auth/pub_key.pem", "w") as f:
+    f.write(pub.decode())
+    f.close
+
+"""
 
 

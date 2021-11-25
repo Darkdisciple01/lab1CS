@@ -1,7 +1,5 @@
-from lab_GUI import *
-from file_operations import *
-from encryption_functions import *
-import cert_auth.certificate_authority as CA
+from setup_GUI import *
+from load_operations import *
 
 
 """
@@ -19,7 +17,6 @@ No returns
 
 
 def mainfunc(seq):
-    global account, message_data
     if seq == [1,88]:
 
         """
@@ -41,15 +38,15 @@ def mainfunc(seq):
         else:
             # Gets index of username, checks passwords
             index = user_database.index(username)
-            passkey, s = scrypt_pass(password, salt_database[index])
-            hashed_passkey = sha256_hash(passkey)
+            passkey, s = ef.scrypt_pass(password, salt_database[index])
+            hashed_passkey = ef.sha256_hash(passkey)
 
             if not hashed_passkey == pass_database[index]:
                 # incorrect password
                 Widgets.seq([0,3,16])
             else:
                 # verifying account with signature
-                data = read_file()
+                data = fop.read_file()
                 account = data["users"][index]
                 material = json.dumps(account[0]).encode()
                 signature = b64decode(account[1]["signature"].encode())
@@ -58,10 +55,10 @@ def mainfunc(seq):
                     # calculate the private key
                     enc_priv = b64decode(account[0]["enc_priv"].encode())
                     nonce = b64decode(account[0]["nonce"].encode())
-                    priv = aes_decrypt(passkey, enc_priv, nonce)
+                    priv = ef.aes_decrypt(passkey, enc_priv, nonce)
                     # load into Data class
                     Data.login(account, priv)
-                    # Loads the user's chats
+                    # Loads the user's chats (load_operations)
                     chat_load()
                 else:
                     # verification error
@@ -93,17 +90,17 @@ def mainfunc(seq):
                 Widgets.seq([2,3,19])
             else:
                 # create new account
-                passkey, salt = scrypt_pass(password)
+                passkey, salt = ef.scrypt_pass(password)
                 priv, pub = CA.generate_key_pair()
-                enc_priv, nonce = aes_encrypt(priv.decode('utf-8'), passkey)
+                enc_priv, nonce = ef.aes_encrypt(priv.decode('utf-8'), passkey)
                 priv_int = int(CA.pem_to_hex(priv, 128), 0)
-                Y = generate_Y(priv_int)
+                Y = ef.generate_Y(priv_int)
                 Y_signed = CA.sign(str(Y).encode(), priv)
-                enc_priv, nonce = aes_encrypt(priv.decode('utf-8'), passkey)
-                hashed_passkey = sha256_hash(passkey)
+                enc_priv, nonce = ef.aes_encrypt(priv.decode('utf-8'), passkey)
+                hashed_passkey = ef.sha256_hash(passkey)
                
-                add_user(username, salt, hashed_passkey, pub, enc_priv, nonce, Y, Y_signed)
-                load_account_data()
+                fop.add_user(username, salt, hashed_passkey, pub, enc_priv, nonce, Y, Y_signed)
+                fop.load_account_data()
 
         elif empty:
             # one of the fields is empty
@@ -124,10 +121,10 @@ def mainfunc(seq):
 
         message = get_message()
 
-        enc_message, nonce = aes_encrypt(message, key)
-        add_message(enc_message, nonce) # account includes information on the chat
+        enc_message, nonce = ef.aes_encrypt(message, key)
+        fop.add_message(enc_message, nonce) # account includes information on the chat
                 
-        chat = get_chat(Data.t_username, Data.c_other)
+        chat = fop.get_chat(Data.t_username, Data.c_other)
         if chat == -1:
             print("MAJOR LOGICAL ERROR IN load_chat")
             exit(-6)
@@ -157,13 +154,13 @@ def mainfunc(seq):
                 Widgets.seq([5,20])
             else:
                 # check if chat already exists
-                flag = get_chat(username, Data.t_username)
+                flag = fop.get_chat(username, Data.t_username)
                 if flag == -1:
-                    x, salt = scrypt_pass("b")
-                    add_chat(username, salt)
+                    x, salt = ef.scrypt_pass("only_using_salt")
+                    fop.add_chat(username, salt)
                     # reload chats
                     chat_load()
-                    msg_load(get_chat(username, Data.t_username))
+                    msg_load(fop.get_chat(username, Data.t_username))
                 else:
                     Widgets.seq([5,21])
 

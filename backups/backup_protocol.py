@@ -1,6 +1,7 @@
-from encryption_functions import hash_file
 import json
 import tkinter as tk
+from encryption_functions import hash_file
+from database.file_operations import wipe_database
 from Data_class import *
 
 """
@@ -10,7 +11,7 @@ backup is added into the file "backup1", and contents of "backup1" are pushed to
 Only 2 backup files and their hashes are stored
 """
 
-def add_backup(filename = "data.json"):
+def add_backup(filename = "database/data.json"):
 
     # file data
     backup_file = open(filename, "r")
@@ -45,7 +46,7 @@ If it finds a corruption, reverts to last uncorrupted backup
 If no uncorrupted backup, prompts user to wipe database
 unfinished - write load backup 1 and load backup 2
 """
-def check_corruption(filename = "data.json", index = "hash1"):
+def check_corruption(filename = "database/data.json", index = "hash1"):
 
     flag = 0
     backuphashes_path = "backups/backuphashes.json"
@@ -54,14 +55,14 @@ def check_corruption(filename = "data.json", index = "hash1"):
     hash1 = hash_file(filename)
     backuphash = json.load(open(backuphashes_path, "r"))[index]
 
-    if filename == "data.json" and not hash1 == backuphash:
+    if filename == "database/data.json" and not hash1 == backuphash:
         print("Data does not match last backup")
         print("This may be caused by program interruption or data corruption")
         print("Checking backup validity")
         
         if check_corruption("backups/backup1.json", "hash1") == 1:
             # continue with loading backup1
-            f = open("data.json", "w")
+            f = open("database/data.json", "w")
             f.write(open("backups/backup1.json", "r+").read())
             f.close()
             print("\nBackup 1 valid, restoring data")
@@ -75,7 +76,7 @@ def check_corruption(filename = "data.json", index = "hash1"):
         print("\nBackup file 1 corrupted, checking file 2")
         if check_corruption("backups/backup2.json", "hash2") == 1:
             # continue with loading backup2
-            f = open("data.json", "w")
+            f = open("database/data.json", "w")
             f.write(open("backups/backup2.json", "r+").read())
             f.close()
             print("\nBackup 2 valid, restoring data")
@@ -91,9 +92,7 @@ def check_corruption(filename = "data.json", index = "hash1"):
         print("\nBackup file 2 corrupted, requesting permission to wipe system data")
         input("Enter any key to continue...")
         input("Are you sure? This will delete all existing users and chats")
-        f = open("data.json", "w")
-        json.dump({"users":[],"messages":[]},f,indent=4)
-        f.close()
+        wipe_database()
         print("\nDatabase has been wiped, please restart the application")
         add_backup()
         add_backup()

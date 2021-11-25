@@ -108,16 +108,15 @@ def init_msgGUI():
     Widgets.add(2,confirm_passBox)
     Widgets.add(2,Message("Confirm password:",x=100,y=265,wide=100,fs=15))
 
+    # back
+    Widgets.add(2,Button("Back",530,10,wide=40,fs=8,com=[0,3]))
+
     # error
     Widgets.add(17,Message("passwords do not match",230,300,fs=10,wide=200))
     Widgets.add(18,Message("please enter username and password",230,300,fs=10,wide=200))
 
     # error for username already taken
     Widgets.add(19,Message("username already taken",230,300,fs=10,wide=200))
-
-    # back
-    Widgets.add(2,Button("Back",530,10,wide=40,fs=8,com=[0,3]))
-
 
 
     """

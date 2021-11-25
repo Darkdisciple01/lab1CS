@@ -12,7 +12,7 @@ returns a dictionary
 """
 def read_file():
     # Opening JSON file
-    with open('data.json') as json_file:
+    with open('database/data.json') as json_file:
         data = json.load(json_file)
         return data
 
@@ -30,7 +30,7 @@ Description of arguments:
   Y_signed: signature of Y, to prevent impersonation attacks in chat
 For variables which it is necessary, base64 encoding will be performed
 """
-def add_user(username, salt, password, pub, enc_priv, nonce, Y, Y_signed, filename='data.json'):
+def add_user(username, salt, password, pub, enc_priv, nonce, Y, Y_signed, filename='database/data.json'):
     
     js  = json.load(open(filename))
     # Creating the dictionary
@@ -67,9 +67,9 @@ def add_user(username, salt, password, pub, enc_priv, nonce, Y, Y_signed, filena
 """
 Finds and removes user with given username
 """
-def remove_user(username, filename='data.json'):
+def remove_user(username, filename='database/data.json'):
 
-    js  = json.load(open("data.json"))
+    js  = json.load(open(filename))
 
     # Iterate through the objects in the JSON and pop (remove)
     # the obj once we find it.
@@ -118,15 +118,12 @@ def load_message_data():
     return data["messages"]
 
 
-
-
-
 """
 adds message to the chat opened in "account"
 message must be encrypted
 """
 
-def add_message(message, nonce, filename='data.json'):
+def add_message(message, nonce, filename='database/data.json'):
 
     b64message = b64encode(message).decode()
     b64nonce = b64encode(nonce).decode()
@@ -159,7 +156,7 @@ def add_message(message, nonce, filename='data.json'):
 creates a new chat with given specifications
 key must already be hashed
 """
-def add_chat(username, salt, filename='data.json'):
+def add_chat(username, salt, filename='database/data.json'):
 
     js = json.load(open(filename))
     salt_b64 = b64encode(salt).decode()
@@ -183,7 +180,7 @@ def add_chat(username, salt, filename='data.json'):
 Deletes the chat between user1 and user2, if it exists
 
 """
-def remove_chat(user1, user2, filename = 'data.json'):
+def remove_chat(user1, user2, filename = 'database/data.json'):
 
     js = json.load(open(filename))
 
@@ -248,6 +245,26 @@ def get_chat(user1, user2):
     return ret
 
 
+
+
+"""
+Finds and returns account associated with the user
+"""
+def get_u(username):
+    users = read_file()["users"]
+    for user in users:
+        if user[0]["username"] == username:
+            return user
+    return -1
+
+
+"""
+Wipes database/data.json to original state
+"""
+def wipe_database(filename = "database/data.json"):
+    f = open(filename, "w")
+    json.dump({"users":[],"messages":[]},f,indent=4)
+    f.close()
 
 
 
