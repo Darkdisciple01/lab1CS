@@ -37,7 +37,6 @@ class Widgets:
             for widget in Widgets.widgets:
                 if widget[0] == num:
                     widget[1].place()
-                    #print("placing widget under: "+ str(num))
         main_loop.mainfunc(n)
 
 
@@ -46,7 +45,6 @@ class Widgets:
         for num in Widgets.currentSeq:
             for widget in Widgets.widgets:
                 if widget[0] == num:
-                    #print("removing widget under: " + str(num))
                     widget[1].forget()
 
     @staticmethod
@@ -78,7 +76,6 @@ class Widget:
         self.data=[widget,frame,x,y,0]
 
     def place(self):
-        #print("trying to place message" if self.data[4]==0 else "trying to print button") 
         self.data[1].place(x=self.data[2],y=self.data[3])
         self.data[0].pack()
 

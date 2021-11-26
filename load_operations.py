@@ -23,6 +23,7 @@ def chat_load():
     page = 100
     Widgets.add(100,Button("^",x=550,y=40,wide=70,com=[1,100]))
 
+    # add a button for each chat
     new_button = ""
     i = 0
     for chat in data:
@@ -43,18 +44,19 @@ def chat_load():
 
     Widgets.add(page,Button("v",x=550,y=350,wide=70,com=[1,page]))
 
+    # if no chats
     if i == 0:
         Widgets.add(100,Message("Sorry, you have no chats at this time",190,175,wide=200,fs=18))
 
+    # display first page of chats
     Widgets.seq([100,1])
 
 
 
 
 """
-Reloads messages in the range: pages 110-129
-Assumes access has already been granted
-Assumes account already points to current chat (hence reload)
+Loads all messages in the chat provided
+Verifies the validity of other user's account and Y value
 """
 def msg_load(chat):
     new_message = Data.get_boxes2()
@@ -89,7 +91,7 @@ def msg_load(chat):
 
     shared_key = ef.generate_Y(a, Y_other)
 
-    #turn shared_key into shared bytes
+    #turn shared_key into bytes
     salt = Data.c_salt
     key, s = ef.scrypt_pass(str(shared_key), salt)
     Data.load_chat_key(key)
@@ -104,6 +106,7 @@ def msg_load(chat):
     Widgets.add(110,Button("^",x=550,y=40,wide=70,com=[110]))
     js = json.load(open('database/data.json'))
 
+    # create Text for each message
     for message in chat["msg_data"]:
         #decrypt text
         text = ef.aes_decrypt(key, b64decode(message["msg"]), b64decode(message["nonce"]))

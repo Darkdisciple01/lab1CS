@@ -100,13 +100,8 @@ def scrypt_pass(password, salt=Random.get_random_bytes(16)):
 """
 Raises g^a mod p
 Used for Diffie Hellman where Y = g^a mod p, and K = Y^b mod p
-This function uses a 4096 bit p, considered cryptographically secure for 256 bit AES key size by Rosseau
-    Rousseau, F. "New Time and Space Based Key Size
-                Equivalents for RSA and Diffie-Hellman", December 2000,
-                http://www.sandelman.ottawa.on.ca/ipsec/2000/12/
-                msg00045.html
+This function uses a 4096 bit p, considered cryptographically secure for 256 bit AES key
 512 bit a and b is standard - using double the bits of security of the key
-(128 digits of hex)
 returns Y
 """
 

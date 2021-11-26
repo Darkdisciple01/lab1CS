@@ -187,6 +187,47 @@ def mainfunc(seq):
         Data.session_clear()
         Widgets.seq([0,3])
 
+    
+    if seq == [88,93]:
+
+        """
+        On pressing continue to delete chat with given username
+        """
+
+        username = get_username()
+        user_database = Data.get_databases()[0]
+
+        if username == "":
+            Widgets.seq(6)
+        else:
+            # attempt to remove chat
+            flag = fop.remove_chat(username, Data.t_username)
+            if flag:
+                # if removal fails/username is incorrect
+                Widgets.seq([6,23])
+            else:
+                # if chat removal succeeds
+                chat_load()
+
+
+    
+    if seq == [88,94]:
+
+        """
+        On pressing yes to delete account
+        """
+
+        flag = fop.delete_user(Data.t_username)
+        if flag:
+            # if username could not be found in database
+            Widgets.seq([4,24])
+        else:
+            # reloading account data and logging out
+            fop.load_account_data()
+            Widgets.seq([88,92])
+
+
+
 
 
 

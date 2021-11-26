@@ -1,49 +1,40 @@
 from main_loop import *
 import backups.backup_protocol as bp
 
+
 """
 Loading the GUI class and interface
 """
-print("Loading the GUI class and interface")
-
 root = tk.Tk()
 Widgets(root)
 Data.root = root
-init_msgGUI()
+init_msgGUI() # setup_GUI.py
 
 
 """
-Checking for corruption, loading variables into data class
+Checking for corruption
 """
-print("Checking for corruption, loading variables into data class")
-
 corruption = bp.check_corruption()
 if corruption == 0:
     exit(0)
 
+
+"""
+Loading account variables into Data class
+"""
 fop.load_account_data()
-message_data = fop.load_message_data()
 
 
 """
-Different operation modes
-0,NULL for GUI, 1 for Testing
+Starting GUI with pages 0,3: login
 """
-print("Starting GUI")
-
-import sys
-x = (int)(sys.argv[1]) if (len(sys.argv)>1) else 0
-
-if x == 0:
-    # initiation
-    Widgets.seq([0, 3])
-    root.mainloop()
-
-if x == 1:
-    # testing
-    root.withdraw()
+Widgets.seq([0, 3])
+root.mainloop()
 
 
+"""
+Backing up database (after window close)
+"""
 bp.add_backup()
 
 

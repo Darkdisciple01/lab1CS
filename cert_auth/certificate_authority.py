@@ -33,7 +33,7 @@ def verify(data, signature, key = open("./cert_auth/pub_key.pem", "r").read()):
 
 """
 Generates a RSA public/private key pair
-Uses 2048 bit RSA with e=65537, FIPS standard
+Uses 4096 bit RSA with e=65537, FIPS standard
 returns private, public key
 """
 def generate_key_pair():

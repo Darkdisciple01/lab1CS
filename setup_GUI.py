@@ -14,22 +14,28 @@ Page designation:
 1           message board helper widgets
 2           create user
 3           username and password input
-4           REMOVEDFROMFEATURES
-5           enter username
-6-14        *unused* designated for page operations
+4           account
+5           enter username (create chat)
+6           enter username (delete chat)
+7           are you sure? (deleting account)
+8-14        *unused* designated for page operations
 15-16       login errors
 17-19       create user errors
 20          cannot create chat with self error
 21          chat already exists
 22          verification error
-23-29       *unused* designated for errors
+23          chat does not exist
+24          error deleting account
+25-29       *unused* designated for errors
 30-87       *undesignated*
 88          no widgets contained, used in mainloop as a general indicator
 89          no widgets contained, indicates message needs to be sent
 90          no widgets contained, indicates new chat
 91          no widgets contained, indicates reload messages
 92          no widgets contained, indicates logout
-93-99       *unused* designated for indicators
+93          no widgets contained, indicates deleting chat
+94          no widgets contained, indicates deleting user
+95-99       *unused* designated for indicators
 100-108     displays chats (<45)
 109         enter password for chat
 110-129     displays messages in chat
@@ -81,7 +87,7 @@ def init_msgGUI():
     Widgets.add(1,Message("Messages",225,10,color="darkgray",wide=200,high=40,fs=20))
 
     # log out
-    Widgets.add(1,Button("Logout",530,10,wide=40,fs=8,com=[88,92]))
+    Widgets.add(1,Button("Account",525,10,wide=40,fs=8,com=[4]))
 
     # create new chat
     Widgets.add(1,Button("New Chat",5,10,wide=40,fs=8,com=[5]))
@@ -119,24 +125,58 @@ def init_msgGUI():
     Widgets.add(19,Message("username already taken",230,300,fs=10,wide=200))
 
 
+
     """
     Page 3
     user input
     """
 
-    # user input
+    # box titles
     Widgets.add(3,Message("Username:",x=100,y=125,wide=100,fs=15))
     Widgets.add(3,Message("Password:",x=100,y=200,wide=100,fs=15))
 
+    # input boxes
     userBox = Input_Box(x=250,y=125,wide=100)
     Widgets.add(3,userBox)
     passBox = Input_Box(x=250,y=200,wide=100,hidden=1)
     Widgets.add(3,passBox)
 
 
+
+    """
+    Page 4
+    account
+    """
+   
+    # title
+    Widgets.add(4,Message("Account Operations",180,20,wide=300,fs=20))
+
+    # log out
+    bl = Button("Logout",140,115,wide=40,fs=8,com=[88,92])
+    bl.configure(40,2)
+    Widgets.add(4,bl)
+
+    # delete chat
+    bdc = Button("Delete a chat",140,195,wide=40,fs=8,com=[6])
+    bdc.configure(40,2)
+    Widgets.add(4,bdc)
+
+    # delete user
+    bdu = Button("Delete account",140,275,wide=40,fs=8,com=[7])
+    bdu.configure(40,2)
+    Widgets.add(4,bdu)
+
+    # back
+    Widgets.add(4,Button("Back",530,10,wide=40,fs=8,com=[88,91]))
+
+    # error for account deletion failure
+    Widgets.add(24,Message("error deleting account, please log out and try again",x=140,y=330,fs=10,wide=400))
+
+
+
     """
     Page 5
-    enter username
+    enter username (create chat)
     """
 
     # user input
@@ -159,6 +199,52 @@ def init_msgGUI():
     Widgets.add(21,Message("chat already exists",x=200,y=250,fs=10,wide=200))
 
 
+
+    """
+    Page 6
+    enter username (delete chat)
+    """
+    
+    # user input
+    Widgets.add(6,chat_username)
+
+    # title
+    Widgets.add(6,Message("Please enter the username of whose chat you'd like to delete",100,25,wide=400,fs=18))
+
+    # continue
+    Widgets.add(6,Button("Continue",x=235,y=320,wide=100,com=[88,93]))
+
+    # back
+    Widgets.add(6,Button("Back",530,10,wide=40,fs=8,com=[4]))
+
+    # error for incorrect username
+    Widgets.add(23,Message("chat does not exist",x=230,y=250,fs=10,wide=200))
+
+    
+    
+    """
+    Page 7
+    are you sure? (delete account)
+    """
+    
+    # title
+    Widgets.add(7,Message("Are you sure you want to delete your account? This will also delete all of your existing chats.",100,25,wide=400,fs=18))
+    
+    # yes
+    yes = Button("Yes",140,155,wide=40,fs=8,com=[88,94])
+    yes.configure(40,2)
+    Widgets.add(7,yes)
+
+    # no
+    no = Button("No",140,250,wide=40,fs=8,com=[4])
+    no.configure(40,2)
+    Widgets.add(7,no)
+
+
+
+    """
+    sending boxes to Data class
+    """
     Data.set_boxes(userBox, passBox, confirm_passBox, new_message, chat_username)
 
 
@@ -174,6 +260,7 @@ def get_message():
     new_message.clear()
     return temp
 
+
 """
 Returns the contents of chat_username
  - username entry box found in page 5
@@ -184,3 +271,7 @@ def get_username():
     temp = chat_username.get_val()
     chat_username.clear()
     return temp
+
+
+
+

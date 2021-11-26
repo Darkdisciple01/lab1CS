@@ -6,7 +6,7 @@ from datetime import date
 
 
 """
-Reads 'data.json'
+Reads the data file from database
 returns a dictionary
 
 """
@@ -33,8 +33,8 @@ For variables which it is necessary, base64 encoding will be performed
 def add_user(username, salt, password, pub, enc_priv, nonce, Y, Y_signed, filename='database/data.json'):
     
     js  = json.load(open(filename))
-    # Creating the dictionary
     
+    # encoding bytes with base 64
     salt_b64 = b64encode(salt).decode('utf-8')
     password_b64 = b64encode(password).decode('utf-8')
     pub_b64 = b64encode(pub).decode('utf-8')
@@ -42,14 +42,17 @@ def add_user(username, salt, password, pub, enc_priv, nonce, Y, Y_signed, filena
     nonce_b64 = b64encode(nonce).decode('utf-8')
     Y_signed_b64 = b64encode(Y_signed).decode('utf-8')
 
+    # creating dictionary
     new_data = {"username": str(username), "salt": salt_b64, "password": password_b64, "enc_priv": enc_priv_b64, "pub": pub_b64, "nonce": nonce_b64, "Y": Y, "Y_signed": Y_signed_b64}
 
+    # signing dictionary
     signature = CA.sign(json.dumps(new_data).encode())
     signature_b64 = b64encode(signature).decode('utf-8')
     todays_date = date.today().strftime("%m/%d/%y")
 
     new_data2 = {"name": str(username), "signature": signature_b64, "authority": "ROOT", "date_created": todays_date}
 
+    # adding signature
     union = [0,0]
     union[0] = new_data
     union[1] = new_data2
@@ -80,7 +83,7 @@ def remove_user(username, filename='database/data.json'):
             flag = 0
             break
     if flag == 1:
-        raise TypeError(str(username) + " not found in database")
+        return -1
 
     with open(filename, 'r+') as file:
         # Sets file's current position at offset.
@@ -88,6 +91,8 @@ def remove_user(username, filename='database/data.json'):
         # convert back to json.
         json.dump(js, file, indent=4)
         file.truncate()
+    
+    return 0
 
 
 """
@@ -95,6 +100,7 @@ returns databases for "users" part of data
 each index of either database represents a user
 """
 def load_account_data():
+    # iterate through data, decode, format, and add to Data class
     data = read_file()
 
     user_database = []
@@ -125,6 +131,7 @@ message must be encrypted
 
 def add_message(message, nonce, filename='database/data.json'):
 
+    # encoding and adding to dictionary
     b64message = b64encode(message).decode()
     b64nonce = b64encode(nonce).decode()
     new_data = {"sent_by": Data.t_username, "msg": b64message, "nonce": b64nonce}
@@ -203,7 +210,9 @@ def remove_chat(user1, user2, filename = 'database/data.json'):
             # convert back to json.
             json.dump(file_data, file, indent=4)
             file.truncate()
-
+        return 0
+    else:
+        return -1
 
 
 
@@ -215,7 +224,7 @@ def delete_user(user):
     user_database = Data.user_database
     for other_user in user_database:
         remove_chat(user, other_user)
-    remove_user(user)
+    return remove_user(user)
 
 
 
