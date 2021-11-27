@@ -76,12 +76,13 @@ def remove_user(username, filename='database/data.json'):
 
     # Iterate through the objects in the JSON and pop (remove)
     # the obj once we find it.
-    for i in range(len(js["users"])):
+    for i, user in enumerate(js["users"]):
         flag = 1
-        if js["users"][i][0]["username"] == str(username):
+        if user[0]["username"] == str(username):
             js["users"].pop(i)
             flag = 0
             break
+
     if flag == 1:
         return -1
 
@@ -139,10 +140,10 @@ def add_message(message, nonce, filename='database/data.json'):
     js = json.load(open(filename))
     index = -1
 
-    chat = Data.c_chat
+    c_chat = Data.c_chat
 
-    for i in range(len(js["messages"])):
-        if js["messages"][i]["user1"] == chat["user1"] and js["messages"][i]["user2"] == chat["user2"]:
+    for i, chat in enumerate(js["messages"]):
+        if chat["user1"] == c_chat["user1"] and chat["user2"] == c_chat["user2"]:
             index = i
 
     if not index == -1:
@@ -193,10 +194,10 @@ def remove_chat(user1, user2, filename = 'database/data.json'):
 
     index = -1
 
-    for i in range(len(js["messages"])):
-        if js["messages"][i]["user1"] == user1 and js["messages"][i]["user2"] == user2:
+    for i, chat in enumerate(js["messages"]):
+        if chat["user1"] == user1 and chat["user2"] == user2:
             index = i
-        if js["messages"][i]["user1"] == user2 and js["messages"][i]["user2"] == user1:
+        if chat["user1"] == user2 and chat["user2"] == user1:
             index = i
 
     if index >= 0:

@@ -22,24 +22,24 @@ class Widgets:
         rootg.wm_title("")
         root = rootg
 
+    # adds widget w to sequence n
     @staticmethod
     def add(n,w):
-        #input widget w and number n, the number n being of the sequence it is displayed in
         Widgets.widgets.append((n,w))
 
+    # places all widgets with a value within n
     @staticmethod
     def seq(n):
         Widgets.clear()
         if(isinstance(n,int)):
             n = [n]
         Widgets.currentSeq = n
-        for num in n:    
-            for widget in Widgets.widgets:
-                if widget[0] == num:
-                    widget[1].place()
+        for widget in Widgets.widgets:
+            if widget[0] in n:
+                widget[1].place()
         main_loop.mainfunc(n)
 
-
+    # clears widgets from screen
     @staticmethod
     def clear():
         for num in Widgets.currentSeq:
@@ -47,6 +47,7 @@ class Widgets:
                 if widget[0] == num:
                     widget[1].forget()
 
+    # deletes all Widgets with number n from the list
     @staticmethod
     def rem_seq(n):
         x = len(Widgets.widgets)
@@ -84,6 +85,7 @@ class Widget:
         self.data[1].place_forget()
 
 
+# creates a Message box with specified conditions
 class Message(Widget):
     def __init__(self, text, x, y, wide=200, high=40, fs=14, color="lightgray"):
         frame = tk.Frame(Widget.root,bg=Widget.backgroundColor,width=wide,height=high,highlightbackground=color)
@@ -92,6 +94,7 @@ class Message(Widget):
         super().__init__(msg, frame, x, y)
 
 
+# creates a Button with specified conditions, com is the sequence run on click
 class Button(Widget):
     def __init__(self, text, x, y, msgload=0, com=0, wide=200, high=40, fs=14, color="lightgray"):
         frame = tk.Frame(Widget.root,bg=Widget.backgroundColor,width=wide,height=high,highlightbackground=color)
@@ -106,6 +109,7 @@ class Button(Widget):
         self.data[0].configure(width=wide, height=high)
 
 
+# creates an Input Box with specified conditions
 class Input_Box(Widget):
     def __init__(self, x, y, hidden=0, entry_var="", wide=200, high=40, fs=14, color="lightgray"):
         frame = tk.Frame(Widget.root,bg=Widget.backgroundColor,width=wide,height=high,highlightbackground=color)
@@ -127,6 +131,7 @@ class Input_Box(Widget):
         self.data[5].set("")
 
 
+# creates a Text box with specified attributes
 class Text(Widget):
     def __init__(self, text, x, y, wide=200, high=40, fs=14, color="lightgray", highl=2):
         frame = tk.Frame(Widget.root,bg=Widget.backgroundColor,width=wide,height=high,highlightbackground=color)

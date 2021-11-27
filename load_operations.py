@@ -98,6 +98,7 @@ def msg_load(chat):
 
     for i in range(110,130):
         Widgets.rem_seq(i)
+
     page = 110
     line = 50
     start = 1
