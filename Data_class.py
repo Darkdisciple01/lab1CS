@@ -1,4 +1,5 @@
 from base64 import b64encode, b64decode
+import time
 
 """
 Class for storing all program data locally during the code's execution
@@ -26,6 +27,8 @@ class Data:
     confirm_passBox = None
     msgBox = None
     chatUsrBox = None
+
+    time_counter = 0.01
 
     @staticmethod
     def login(user, privkey):
@@ -68,6 +71,7 @@ class Data:
         Data.msgBox = mBox
         Data.chatUsrBox = cuBox
 
+    @staticmethod
     def load_chat_data(chat):
         Data.c_chat = chat
         # chat must contain logged in user - logically enforced in code
@@ -75,9 +79,19 @@ class Data:
         Data.c_other = other
         Data.c_salt = b64decode(chat["salt"].encode())
 
+    @staticmethod
     def load_chat_key(key):
         Data.c_key = key
+    
+    @staticmethod
+    def wait(reset = 0):
+        if not reset:
+            time.sleep(Data.time_counter)
+            Data.time_counter *= 2
+        else:
+            Data.time_counter = 0.01
 
+    @staticmethod
     def session_clear():
         Data.t_username = ""
         Data.t_priv = ""

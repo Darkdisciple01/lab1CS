@@ -43,6 +43,7 @@ def mainfunc(seq):
 
             if not hashed_passkey == pass_database[index]:
                 # incorrect password
+                Data.wait()
                 Widgets.seq([0,3,16])
             else:
                 # verifying account with signature
@@ -58,6 +59,7 @@ def mainfunc(seq):
                     priv = ef.aes_decrypt(passkey, enc_priv, nonce)
                     # load into Data class
                     Data.login(account, priv)
+                    Data.wait(reset=1)
                     # Loads the user's chats (load_operations)
                     chat_load()
                 else:
